@@ -1,0 +1,12 @@
+<settings>
+  <localRepository>/opt/jboss/wildfly/bin/repositories/kie</localRepository>
+
+  <servers>
+    <server>
+      <id>artifact-repository</id>
+      <!-- Nexus credentials -->
+      <username>admin</username>
+      <password>admin123</password>
+    </server>
+  </servers>
+</settings>

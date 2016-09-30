@@ -1,0 +1,33 @@
+<distributionManagement>
+  <repository>
+    <id>artifact-repository</id>
+    <name>Artifact Repository - Nexus</name>
+    <url>http://localhost:8282/repository/maven-releases</url>
+  </repository>
+  <snapshotRepository>
+    <id>artifact-repository</id>
+    <name>Artifact Repository - Nexus</name>
+    <url>http://localhost:8282/repository/maven-snapshots/</url>
+  </snapshotRepository>
+</distributionManagement>
+
+--------------------------------
+After change of --net="host"
+
+<properties>
+  <repo.addr>${env.AREPO_PORT_8081_TCP_ADDR}</repo.addr>
+  <repo.port>${env.AREPO_PORT_8081_TCP_PORT}</repo.port>
+</properties>
+<distributionManagement>
+  <repository>
+    <id>artifact-repository</id>
+    <name>Artifact Repository - Nexus</name>
+    <url>http://${repo.addr}:${repo.port}/repository/maven-releases</url>
+  </repository>
+  <snapshotRepository>
+    <id>artifact-repository</id>
+    <name>Artifact Repository - Nexus</name>
+    <url>http://${repo.addr}:${repo.port}/repository/maven-snapshots/</url>
+  </snapshotRepository>
+</distributionManagement>
+
