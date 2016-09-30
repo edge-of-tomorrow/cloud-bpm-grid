@@ -34,6 +34,7 @@
     </extensions>
     
     <system-properties>
+        <property name="org.kie.example.repositories" value="/init-repositories"></property>
         <property name="org.kie.server.user" value="communicator"></property>
         <property name="org.kie.server.pwd" value="communicator1234!"></property>
         <property name="org.jbpm.designer.perspective" value="full"/>

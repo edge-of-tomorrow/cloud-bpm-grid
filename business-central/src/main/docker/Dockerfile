@@ -11,6 +11,8 @@ ENV BUSINESS_CENTRAL_VERSION 7.0.0-SNAPSHOT
 ENV BUSINESS_CENTRAL_WAR kie-wb-1.0-SNAPSHOT.war
 EXPOSE 8080
 
+VOLUME ["/init-repositories"]
+
 ####### SYSTEM USERS FOR DEVELOPMENT ############
 USER root
 # Set a password for root & jboss users (for any further system operations, etc)
@@ -44,7 +46,8 @@ chown jboss:jboss $JBOSS_HOME/bin/start-business-central.sh && \
 chown jboss:jboss $JBOSS_HOME/standalone/configuration/business-central-users.properties && \ 
 chown jboss:jboss $JBOSS_HOME/standalone/configuration/business-central-roles.properties && \
 chown jboss:jboss $JBOSS_HOME/standalone/configuration/standalone-full-business-central.xml && \
-chown jboss:jboss $JBOSS_HOME/bin/settings.xml
+chown jboss:jboss $JBOSS_HOME/bin/settings.xml && \
+chown jboss:jboss /init-repositories
 
 # Switchback to jboss user
 USER jboss

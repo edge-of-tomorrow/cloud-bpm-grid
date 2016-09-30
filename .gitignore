@@ -14,3 +14,7 @@
 # Maven
 log/
 target/
+
+# Others
+bpm-assets/init
+process-server/process-server-1.xml
