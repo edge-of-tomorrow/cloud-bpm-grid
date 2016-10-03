@@ -34,7 +34,6 @@
     </extensions>
     
     <system-properties>
-        <property name="org.kie.example.repositories" value="/init-repositories"></property>
         <property name="org.kie.server.user" value="communicator"></property>
         <property name="org.kie.server.pwd" value="communicator1234!"></property>
         <property name="org.jbpm.designer.perspective" value="full"/>
@@ -370,6 +369,8 @@
                         <login-module code="RealmDirect" flag="required">
                             <module-option name="password-stacking" value="useFirstPass"/>
                         </login-module>
+                        <login-module code="org.kie.security.jaas.KieLoginModule" flag="optional"
+                                module="deployment.business-central.war"/>
                     </authentication>
                 </security-domain>
                 <security-domain name="jboss-web-policy" cache-type="default">

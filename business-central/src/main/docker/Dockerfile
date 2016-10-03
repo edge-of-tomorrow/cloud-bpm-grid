@@ -11,7 +11,7 @@ ENV BUSINESS_CENTRAL_VERSION 7.0.0-SNAPSHOT
 ENV BUSINESS_CENTRAL_WAR kie-wb-1.0-SNAPSHOT.war
 EXPOSE 8080
 
-VOLUME ["/init-repositories"]
+VOLUME ["/opt/jboss/wildfly/bin/.niogit"]
 
 ####### SYSTEM USERS FOR DEVELOPMENT ############
 USER root
@@ -47,7 +47,7 @@ chown jboss:jboss $JBOSS_HOME/standalone/configuration/business-central-users.pr
 chown jboss:jboss $JBOSS_HOME/standalone/configuration/business-central-roles.properties && \
 chown jboss:jboss $JBOSS_HOME/standalone/configuration/standalone-full-business-central.xml && \
 chown jboss:jboss $JBOSS_HOME/bin/settings.xml && \
-chown jboss:jboss /init-repositories
+chown jboss:jboss /opt/jboss/wildfly/bin/.niogit
 
 # Switchback to jboss user
 USER jboss
