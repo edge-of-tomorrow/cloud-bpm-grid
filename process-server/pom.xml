@@ -15,7 +15,6 @@
 
     <version.h2>1.4.192</version.h2>
     <version.postgresql>9.4.1209</version.postgresql>
-    <version.mysql>5.1.39</version.mysql>
 
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -308,10 +307,11 @@
           <artifactId>h2</artifactId>
           <version>${version.h2}</version>
         </dependency>
-        <!-- <dependency> <groupId>org.postgresql</groupId> <artifactId>postgresql</artifactId> 
-          <version>${version.postgresql}</version> </dependency> <dependency> <groupId>mysql</groupId> 
-          <artifactId>mysql-connector-java</artifactId> <version>${version.mysql}</version> 
-          </dependency> -->
+        <dependency>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <version>${version.postgresql}</version>
+        </dependency>
       </dependencies>
       <build>
         <resources>
@@ -352,22 +352,22 @@
       </build>
     </profile>
   </profiles>
-  
-  <repositories>  
-    <repository>  
-      <id>jboss-public-repository-group</id>  
-      <name>JBoss Public Repository Group</name>  
-      <url>http://repository.jboss.org/nexus/content/groups/public/</url>  
-      <layout>default</layout>  
-      <releases>  
-        <enabled>true</enabled>  
-        <updatePolicy>never</updatePolicy>  
-      </releases>  
-      <snapshots>  
-        <enabled>true</enabled>  
-        <updatePolicy>never</updatePolicy>  
-      </snapshots>  
-    </repository>  
+
+  <repositories>
+    <repository>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Repository Group</name>
+      <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </snapshots>
+    </repository>
   </repositories>
-  
+
 </project>

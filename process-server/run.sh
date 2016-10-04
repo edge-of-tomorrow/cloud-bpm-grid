@@ -2,4 +2,21 @@
 
 BASE=`pwd`
 
-java -Dorg.kie.server.id=process-server-1 -Dorg.kie.server.location=http://localhost:8181/server -Dswarm.port.offset=101 -Dorg.kie.server.controller=http://localhost:8080/business-central/rest/controller -Dorg.kie.server.controller.user=communicator -Dorg.kie.server.controller.pwd=communicator1234! -Dkie.maven.settings.custom=$BASE/settings.xml -jar target/process-server-1.0-SNAPSHOT-swarm.jar
+PROCESS_SERVER_ID=process-server-1
+PROCESS_SERVER_LOCATION=http://localhost:8181/server
+PROCESS_SERVER_OFFSET=101
+PROCESS_SERVER_INMEM=false
+PROCESS_SERVER_M2_SETTINGS=$BASE/settings.xml
+
+BUSINESS_CENTRAL_URL=http://localhost:8080/business-central
+BUSINESS_CENTRAL_CONTROLLER=$BUSINESS_CENTRAL_URL/rest/controller
+BUSINESS_CENTRAL_CONTROLLER_USER=communicator
+BUSINESS_CENTRAL_CONTROLLER_PWD=communicator1234!
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=bpmgrid
+DB_USER=dbuser
+DB_PWD=dbuser1234!
+
+java -Dorg.kie.server.id=$PROCESS_SERVER_ID -Dorg.kie.server.location=$PROCESS_SERVER_LOCATION -Dswarm.port.offset=$PROCESS_SERVER_OFFSET -Dorg.kie.server.controller=$BUSINESS_CENTRAL_CONTROLLER -Dorg.kie.server.controller.user=$BUSINESS_CENTRAL_CONTROLLER_USER -Dorg.kie.server.controller.pwd=$BUSINESS_CENTRAL_CONTROLLER_PWD -Dkie.maven.settings.custom=$PROCESS_SERVER_M2_SETTINGS -Dorg.kie.server.inmemory=$PROCESS_SERVER_INMEM -Dorg.kie.server.db.host=$DB_HOST -Dorg.kie.server.db.port=$DB_PORT -Dorg.kie.server.db.name=$DB_NAME -Dorg.kie.server.db.username=$DB_USER -Dorg.kie.server.db.password=$DB_PWD -jar target/process-server-1.0-SNAPSHOT-swarm.jar
