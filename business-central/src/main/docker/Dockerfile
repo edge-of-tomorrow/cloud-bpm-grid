@@ -27,6 +27,7 @@ ADD classes/config/business-central-users.properties $JBOSS_HOME/standalone/conf
 ADD classes/config/business-central-roles.properties $JBOSS_HOME/standalone/configuration/business-central-roles.properties
 ADD classes/config/standalone-full-business-central.xml $JBOSS_HOME/standalone/configuration/standalone-full-business-central.xml
 ADD classes/config/settings.xml $JBOSS_HOME/bin/settings.xml
+ADD classes/config/secure-deployment-offline.cli $JBOSS_HOME/bin/secure-deployment-offline.cli
 
 # Custom kie-server Wildfly startup scripts.
 ADD classes/config/start-business-central.sh $JBOSS_HOME/bin/start-business-central.sh
@@ -39,13 +40,25 @@ RUN unzip -q -d $JBOSS_HOME/standalone/deployments/business-central.war $JBOSS_H
 touch $JBOSS_HOME/standalone/deployments/business-central.war.dodeploy && \
 rm -rf $JBOSS_HOME/standalone/deployments/business-central-archive.war
 
+RUN yum -y install wget
+
+RUN wget https://downloads.jboss.org/keycloak/2.2.1.Final/adapters/keycloak-oidc/keycloak-wildfly-adapter-dist-2.2.1.Final.zip -O $JBOSS_HOME/keycloak-adapter.zip
+
+RUN unzip -q -d $JBOSS_HOME/ $JBOSS_HOME/keycloak-adapter.zip && \
+rm $JBOSS_HOME/keycloak-adapter.zip
+
+RUN rm $JBOSS_HOME/standalone/configuration/standalone.xml
+RUN mv $JBOSS_HOME/standalone/configuration/standalone-full-business-central.xml $JBOSS_HOME/standalone/configuration/standalone.xml
+
 # Set right permissions for jboss user.
 RUN chown -R jboss:jboss $JBOSS_HOME/standalone/deployments/* && \
 chmod +x $JBOSS_HOME/bin/*.sh && \
 chown jboss:jboss $JBOSS_HOME/bin/start-business-central.sh && \
+chown jboss:jboss $JBOSS_HOME/bin/adapter-install-offline.cli && \
+chown jboss:jboss $JBOSS_HOME/bin/secure-deployment-offline.cli && \
 chown jboss:jboss $JBOSS_HOME/standalone/configuration/business-central-users.properties && \ 
 chown jboss:jboss $JBOSS_HOME/standalone/configuration/business-central-roles.properties && \
-chown jboss:jboss $JBOSS_HOME/standalone/configuration/standalone-full-business-central.xml && \
+chown jboss:jboss $JBOSS_HOME/standalone/configuration/standalone.xml && \
 chown jboss:jboss $JBOSS_HOME/bin/settings.xml && \
 chown jboss:jboss /opt/jboss/wildfly/bin/.niogit
 
