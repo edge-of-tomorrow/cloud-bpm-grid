@@ -1,0 +1,11 @@
+{
+  "realm" : "bpmgrid",
+  "resource" : "process-server",
+  "realm-public-key" : "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAg2YzHe6vgf8++DfZlxZa/rMpq0XsHscYiBOU+xd9rUQ7enIQL47tAytrQzV+y0KVzvzYI3kKEJz+ZGPbmHueJs9OP23xb4v39BVig2PqlIPTynxpZLBHuskIraVDwBUpUAZyNcs7bqvMCJTgrjIzGo92vtxF3nM1lzKA5RFnWQ33fLdEiRNJ9Px2y3L8b0BT2VGwV8Hrz+yNcNycJjC/tq1lirUj+pyIV+M4FxrBlg3MBjoS2JOIjB7Ub+lxyqc1ZroQQixg0f0e8qZqyoaZqhNmUogVNmoZuaaenduig3XmJ7DMYPsHFCYxcuSRHYoAkbSgBX+pgXfklX4bd+APBQIDAQAB",
+  "auth-server-url" : "http://localhost:8383/auth",
+  "ssl-required" : "external",
+  "enable-basic-auth" : true,
+  "credentials" : {
+    "secret" : "017a65b8-00b4-4e7a-b536-b146a3f0e99a"
+  }
+}

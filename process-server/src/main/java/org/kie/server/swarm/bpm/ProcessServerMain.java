@@ -1,32 +1,39 @@
 package org.kie.server.swarm.bpm;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.Arrays;
 
-import org.kie.server.swarm.AbstractKieServerMain;
-import org.wildfly.swarm.container.Container;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.ClassLoaderAsset;
+import org.jboss.shrinkwrap.api.importer.ZipImporter;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.wildfly.swarm.Swarm;
 import org.wildfly.swarm.datasources.DatasourcesFraction;
-import org.wildfly.swarm.jaxrs.JAXRSArchive;
+import org.wildfly.swarm.keycloak.Secured;
 import org.wildfly.swarm.transactions.TransactionsFraction;
 
-public class ProcessServerMain extends AbstractKieServerMain {
+public class ProcessServerMain {
 
     public static void main(String[] args) throws Exception {
 
-        Container container = new Container();
+        Swarm container = new Swarm();
 
         // Configure the Datasources subsystem with a driver and a datasource
         boolean inMemory = Boolean.valueOf(System.getProperty("org.kie.server.inmemory"));
         if (inMemory) {
-            container.fraction(new DatasourcesFraction().jdbcDriver("h2", (d) -> {
+            /**container.fraction(new DatasourcesFraction().jdbcDriver("h2", (d) -> {
                 d.driverClassName("org.h2.Driver");
                 d.xaDatasourceClass("org.h2.jdbcx.JdbcDataSource");
                 d.driverModuleName("com.h2database.h2");
-            }).dataSource("ExampleDS", (ds) -> {
+            }).dataSource("H2DS", (ds) -> {
                 ds.driverName("h2");
                 ds.connectionUrl("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
                 ds.userName("sa");
                 ds.password("sa");
-            }));
+            }));*/
+            System.setProperty("org.kie.server.persistence.dialect", "org.hibernate.dialect.H2Dialect");
+            System.setProperty("org.kie.server.persistence.ds", "java:jboss/datasources/ExampleDS");
         } else {
             String dbhost = System.getProperty("org.kie.server.db.host");
             String dbport = System.getProperty("org.kie.server.db.port");
@@ -37,7 +44,7 @@ public class ProcessServerMain extends AbstractKieServerMain {
                 d.driverClassName("org.postgresql.Driver");
                 d.xaDatasourceClass("org.postgresql.xa.PGXADataSource");
                 d.driverModuleName("org.postgresql.postgresql");
-            }).dataSource("ExampleDS", (ds) -> {
+            }).dataSource("PostgreDS", (ds) -> {
                 ds.driverName("postgresql");
                 ds.connectionUrl("jdbc:postgresql://" + dbhost + ":" + dbport + "/" + db);
                 ds.userName(username);
@@ -45,20 +52,28 @@ public class ProcessServerMain extends AbstractKieServerMain {
             }));
 
             System.setProperty("org.kie.server.persistence.dialect", "org.hibernate.dialect.PostgreSQLDialect");
-            System.setProperty("org.kie.server.persistence.ds", "java:jboss/datasources/ExampleDS");
+            System.setProperty("org.kie.server.persistence.ds", "java:jboss/datasources/PostgreDS");
             
         }
         // configure transactions
         container.fraction(TransactionsFraction.createDefaultFraction());
 
         System.out.println("\tBuilding kie server deployable...");
-        JAXRSArchive deployment = createDeployment(container);
+        String warPath = "/m2repo/org/kie/server/kie-server/7.0.0-SNAPSHOT/kie-server-7.0.0-SNAPSHOT-ee7.war";
+        File war = new File("target/kie-server-1.0-SNAPSHOT.war");
+        //InputStream war = ProcessServerMain.class.getResourceAsStream(warPath);
+        //if (war == null) {
+        //    System.out.println("Cannot find " + warPath);
+        //}
+        WebArchive deployment = ShrinkWrap.create(ZipImporter.class, "kie-server.war").importFrom(war).as(
+                WebArchive.class);
+        
+        ClassLoaderAsset webxml = new ClassLoaderAsset("/config/web/web.xml", ProcessServerMain.class.getClassLoader());
+        deployment.addAsWebInfResource(webxml, "web.xml");
+        deployment.as(Secured.class);
 
         System.out.println("\tStarting Wildfly Swarm....");
         container.start();
-
-        System.out.println("\tConfiguring kjars to be auto deployed to server " + Arrays.toString(args));
-        installKJars(args);
 
         System.out.println("\tDeploying kie server ....");
         container.deploy(deployment);
