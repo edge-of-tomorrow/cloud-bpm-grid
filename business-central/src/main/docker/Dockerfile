@@ -29,6 +29,9 @@ ADD classes/config/standalone-full-business-central.xml $JBOSS_HOME/standalone/c
 ADD classes/config/settings.xml $JBOSS_HOME/bin/settings.xml
 ADD classes/config/secure-deployment-offline.cli $JBOSS_HOME/bin/secure-deployment-offline.cli
 
+# Patch
+# ADD classes/config/jbpm-console-ng-business-domain-backend-7.0.0-SNAPSHOT.jar $JBOSS_HOME/jbpm-console-ng-business-domain-backend-7.0.0-SNAPSHOT.jar
+
 # Custom kie-server Wildfly startup scripts.
 ADD classes/config/start-business-central.sh $JBOSS_HOME/bin/start-business-central.sh
 
@@ -49,6 +52,10 @@ rm $JBOSS_HOME/keycloak-adapter.zip
 
 RUN rm $JBOSS_HOME/standalone/configuration/standalone.xml
 RUN mv $JBOSS_HOME/standalone/configuration/standalone-full-business-central.xml $JBOSS_HOME/standalone/configuration/standalone.xml
+
+# Patch
+# RUN rm $JBOSS_HOME/standalone/deployments/business-central.war/WEB-INF/lib/jbpm-console-ng-business-domain-backend-7.0.0-SNAPSHOT.jar
+# RUN mv $JBOSS_HOME/jbpm-console-ng-business-domain-backend-7.0.0-SNAPSHOT.jar $JBOSS_HOME/standalone/deployments/business-central.war/WEB-INF/lib/jbpm-console-ng-business-domain-backend-7.0.0-SNAPSHOT.jar
 
 # Set right permissions for jboss user.
 RUN chown -R jboss:jboss $JBOSS_HOME/standalone/deployments/* && \

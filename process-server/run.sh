@@ -5,7 +5,7 @@ BASE=`pwd`
 PROCESS_SERVER_ID=process-server-1
 PROCESS_SERVER_LOCATION=http://localhost:8181/kie-server/rest/server
 PROCESS_SERVER_PORT=8181
-PROCESS_SERVER_INMEM=true
+PROCESS_SERVER_INMEM=false
 PROCESS_SERVER_M2_SETTINGS=$BASE/settings.xml
 
 BUSINESS_CENTRAL_URL=http://localhost:8080/business-central
