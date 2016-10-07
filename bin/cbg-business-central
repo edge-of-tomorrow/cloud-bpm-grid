@@ -17,6 +17,7 @@ COMMANDS:
     start \t Start Business Central in Docker container
     restart \t Restart Business Central in Docker container
     open \t Open Business Central in Browser
+    status \t Show status of Business Central
     stop \t Stop Business Central in Docker container
     clear \t Clear build data and Business Central Docker image
 """
@@ -25,43 +26,51 @@ case $1 in
     setup)
         # nothing to do
     ;;
-    build)
+    build|rebuild)
+        docker rm -f business-central > /dev/null 2>&1
+        docker rmi -f kie/business-central > /dev/null 2>&1
+        echo "[Business Central] Building web archive and creating new Docker image kie/business-central..."
         cd $CBG_HOME/business-central
         mvn clean package
-        cd -
+        cd - > /dev/null
     ;;
-    rebuild)
-        docker rm -f business-central
-        docker rmi -f kie/business-central
-        cd $CBG_HOME/business-central
-        mvn clean package
-        cd -
-    ;;
-    start)
-        docker run -d -p $BC_PORT:8080 --net="host" --name business-central -v $ASSETS_DIR:/opt/jboss/wildfly/bin/.niogit kie/business-central
-    ;;
-    restart)
-        docker rm -f business-central
-        docker run -d -p $BC_PORT:8080 --net="host" --name business-central -v $ASSETS_DIR:/opt/jboss/wildfly/bin/.niogit kie/business-central
+    start|restart)
+        docker rm -f business-central > /dev/null 2>&1
+        echo "[Business Central] Starting new business-central Docker container..."
+        docker run -d -p $BC_PORT:8080 --net="host" --name business-central -v $ASSETS_DIR:/opt/jboss/wildfly/bin/.niogit kie/business-central > /dev/null
     ;;
     open)
         if which xdg-open > /dev/null
         then
-          xdg-open "http://$BC_HOST:$BC_PORT"
+          xdg-open "http://$BC_HOST:$BC_PORT/business-central"
         elif which gnome-open > /dev/null
         then
-          gnome-open "http://$BC_HOST:$BC_PORT"
+          gnome-open "http://$BC_HOST:$BC_PORT/business-central"
+        fi
+    ;;
+    status)
+        isDocker=`docker images | grep ^kie/business-central`
+        if curl --output /dev/null --silent --head --fail "http://$BC_HOST:$BC_PORT/business-central"
+        then
+            echo -e "business-central \t ${CBG_BLUE}running${CBG_NC}"
+        elif [ -n "$isDocker" ] ; then
+            echo -e "business-central \t ${CBG_GREEN}ready to start${CBG_NC}"
+        else
+            echo -e "business-central \t ${CBG_RED}new (needs setup)${CBG_NC}"
         fi
     ;;
     stop)
-        docker rm -f business-central
+        echo "[Business Central] Removing business-central Docker container..."
+        docker rm -f business-central > /dev/null 2>&1
     ;;
     clear)
+        echo "[Business Central] Cleaning Business Central project..."
         cd $CBG_HOME/business-central
-        mvn clean
-        cd -
-        docker rm -f business-central
-        docker rmi -f kie/business-central
+        mvn clean > /dev/null
+        cd - > /dev/null
+        echo "[Business Central] Removing business-central Docker container and its image..."
+        docker rm -f business-central > /dev/null 2>&1
+        docker rmi -f kie/business-central > /dev/null 2>&1
     ;;
     *)
     echo -e "$HELP"

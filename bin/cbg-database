@@ -14,44 +14,63 @@ COMMANDS:
     setup \t Create persistent storage for Database and download postgres Docker image
     start \t Start PostgreSQL database in Docker container
     restart \t Restart PostgreSQL database in Docker container
+    status \t Show status of PostgreSQL database
     stop \t Stop PostgreSQL database in Docker container
-    clear \t Clear persistent storage for Database
+    clear \t Remove DB Data persistent storage
 """
 
-if [ -d "$DB_DIR" ]; then
+if [ -n "$DB_DIR" ]; then
+    DB_IN_MEM=false
+else
     DB_IN_MEM=true
 fi
 
-function startDatabase {
-    if [ "$DB_IN_MEM" = true ] ; then
-        docker run -p $DB_PORT:5432 --name bpm-database -e POSTGRES_DB=$DB_NAME -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PWD -e POSTGRES_ROOT_PASSWORD=rootman1234! -d postgres
-    else
-        docker run -p $DB_PORT:5432 --name bpm-database -e POSTGRES_DB=$DB_NAME -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PWD -e POSTGRES_ROOT_PASSWORD=rootman1234! -v $DB_DIR:/var/lib/postgresql/data -d postgres
-    fi
-}
-
 case $1 in
     setup)
+        echo "[Database] Setting up DB Data persistent storage..."
         if [ -n "$DB_DIR" ]; then
             rm -rf $DB_DIR
             mkdir -p -m 777 $DB_DIR
         fi
-        docker pull postgres
+        echo "[Database] Pulling latest PostgreSQL Docker image..."
+        docker pull postgres > /dev/null 2>&1
     ;;
     build|rebuild)
         # nothing to do
     ;;
-    start)
-        startDatabase
-    ;;
-    restart)
+    start|restart)
+        echo "[Database] Removing bpm-database Docker container..."
         docker rm -f bpm-database
-        startDatabase
+        if [ "$DB_IN_MEM" = true ] ; then
+            echo "[Database] Starting new bpm-database Docker container..."
+            docker run -p $DB_PORT:5432 --name bpm-database -e POSTGRES_DB=$DB_NAME -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PWD -e POSTGRES_ROOT_PASSWORD=rootman1234! -d postgres > /dev/null
+        else
+            echo "[Database] Starting new bpm-database Docker container in persistent storage $DB_DIR..."
+            docker run -p $DB_PORT:5432 --name bpm-database -e POSTGRES_DB=$DB_NAME -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PWD -e POSTGRES_ROOT_PASSWORD=rootman1234! -v $DB_DIR:/var/lib/postgresql/data -d postgres > /dev/null
+        fi
+        echo "- jdbc:postgresql://$DB_HOST:$DB_PORT/$DB_NAME"
+    ;;
+    status)
+        isDBStorage=false
+        isDocker=`docker images | grep ^postgres`
+        if [ -n "$DB_DIR"] || [ "$DB_IN_MEM" = true]; then
+            isDBStorage=true
+        fi
+        if curl --output /dev/null --silent --head --fail "http://$DB_HOST:$DB_PORT"
+        then
+            echo -e "database \t\t ${CBG_BLUE}running${CBG_NC}"
+        elif [ "$isDBStorage" = true ] && [ -n "$isDocker" ] ; then
+            echo -e "database \t\t ${CBG_GREEN}ready to start${CBG_NC}"
+        else
+            echo -e "database \t\t ${CBG_RED}new (needs setup)${CBG_NC}"
+        fi
     ;;
     stop)
-        docker rm -f bpm-database
+        echo "[Database] Removing bpm-database Docker container..."
+        docker rm -f bpm-database > /dev/null 2>&1
     ;;
     clear)
+        echo "[Database] Removing DB Data persistent storage..."
         if [ -n "$DB_DIR" ]; then
             rm -rf $DB_DIR
         fi

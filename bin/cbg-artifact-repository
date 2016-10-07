@@ -15,27 +15,29 @@ COMMANDS:
     start \t Start Nexus 3 in Docker container
     restart \t Restart Nexus 3 in Docker container
     open \t Open Nexus 3 in Browser
+    status \t Show status of Nexus 3
     stop \t Stop Nexus 3 in Docker container
     clear \t Clear persistent storage for Nexus data
 """
 
 case $1 in
     setup)
-        if [ -d "$NEXUS_DATA" ]; then
+        echo "[Artifact Repository] Setting up Nexus Data persistent storage..."
+        if [ -n "$NEXUS_DATA" ]; then
             rm -rf $NEXUS_DATA
         fi
         mkdir -p -m 777 $NEXUS_DATA
-        docker pull sonatype/nexus3
+        echo "[Artifact Repository] Pulling latest Nexus 3 Docker image..."
+        docker pull sonatype/nexus3 > /dev/null
     ;;
     build|rebuild)
         # nothing to do
     ;;
-    start)
-        docker run -d -p $NEXUS_PORT:8081 --name artifact-repository -v $NEXUS_DATA:/nexus-data sonatype/nexus3
-    ;;
-    restart)
-        docker rm -f artifact-repository
-        docker run -d -p $NEXUS_PORT:8081 --name artifact-repository -v $NEXUS_DATA:/nexus-data sonatype/nexus3
+    start|restart)
+        echo "[Artifact Repository] Removing artifact-repository Docker container..."
+        docker rm -f artifact-repository > /dev/null 2>&1
+        echo "[Artifact Repository] Starting new artifact-repository Docker container, please wait... (~30s)"
+        docker run -d -p $NEXUS_PORT:8081 --name artifact-repository -v $NEXUS_DATA:/nexus-data sonatype/nexus3 > /dev/null
     ;;
     open)
         if which xdg-open > /dev/null
@@ -46,8 +48,20 @@ case $1 in
           gnome-open "http://$NEXUS_HOST:$NEXUS_PORT"
         fi
     ;;
+    status)
+        isDocker=`docker images | grep ^sonatype/nexus3`
+        if curl --output /dev/null --silent --head --fail "http://$NEXUS_HOST:$NEXUS_PORT"
+        then
+            echo -e "artifact-repository \t ${CBG_BLUE}running${CBG_NC}"
+        elif [ -n "$NEXUS_DATA" ] && [ -n "$isDocker" ] ; then
+            echo -e "artifact-repository \t ${CBG_GREEN}ready to start${CBG_NC}"
+        else
+            echo -e "artifact-repository \t ${CBG_RED}new (needs setup)${CBG_NC}"
+        fi
+    ;;
     stop)
-        docker rm -f artifact-repository
+        echo "[Artifact Repository] Removing artifact-repository Docker container..."
+        docker rm -f artifact-repository > /dev/null 2>&1
     ;;
     clear)
         rm -rf $NEXUS_DATA
