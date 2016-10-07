@@ -34,7 +34,6 @@ case $1 in
         # nothing to do
     ;;
     start|restart)
-        echo "[Artifact Repository] Removing artifact-repository Docker container..."
         docker rm -f artifact-repository > /dev/null 2>&1
         echo "[Artifact Repository] Starting new artifact-repository Docker container, please wait... (~30s)"
         docker run -d -p $NEXUS_PORT:8081 --name artifact-repository -v $NEXUS_DATA:/nexus-data sonatype/nexus3 > /dev/null
