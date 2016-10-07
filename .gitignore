@@ -16,5 +16,5 @@ log/
 target/
 
 # Others
-bpm-assets/niogit
-process-server/process-server-1.xml
+process-server-1.xml
+persistent-storage

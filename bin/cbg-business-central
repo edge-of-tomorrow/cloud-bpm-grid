@@ -1,0 +1,70 @@
+#!/bin/sh
+
+source $CBG_HOME/conf/base.cfg
+
+# Cloud BPM Grid - Business Central
+
+HELP="""
+Usage: cbg-business-central COMMAND
+       cbg-business-central --help
+
+Business Central for Cloud BPM Grid.
+
+COMMANDS:
+    setup \t No-op
+    build \t Build customized business-central.war and create Docker image
+    rebuild \t Rebuild Business Central Docker image
+    start \t Start Business Central in Docker container
+    restart \t Restart Business Central in Docker container
+    open \t Open Business Central in Browser
+    stop \t Stop Business Central in Docker container
+    clear \t Clear build data and Business Central Docker image
+"""
+
+case $1 in
+    setup)
+        # nothing to do
+    ;;
+    build)
+        cd $CBG_HOME/business-central
+        mvn clean package
+        cd -
+    ;;
+    rebuild)
+        docker rm -f business-central
+        docker rmi -f kie/business-central
+        cd $CBG_HOME/business-central
+        mvn clean package
+        cd -
+    ;;
+    start)
+        docker run -d -p $BC_PORT:8080 --net="host" --name business-central -v $ASSETS_DIR:/opt/jboss/wildfly/bin/.niogit kie/business-central
+    ;;
+    restart)
+        docker rm -f business-central
+        docker run -d -p $BC_PORT:8080 --net="host" --name business-central -v $ASSETS_DIR:/opt/jboss/wildfly/bin/.niogit kie/business-central
+    ;;
+    open)
+        if which xdg-open > /dev/null
+        then
+          xdg-open "http://$BC_HOST:$BC_PORT"
+        elif which gnome-open > /dev/null
+        then
+          gnome-open "http://$BC_HOST:$BC_PORT"
+        fi
+    ;;
+    stop)
+        docker rm -f business-central
+    ;;
+    clear)
+        cd $CBG_HOME/business-central
+        mvn clean
+        cd -
+        docker rm -f business-central
+        docker rmi -f kie/business-central
+    ;;
+    *)
+    echo -e "$HELP"
+    ;;
+esac
+

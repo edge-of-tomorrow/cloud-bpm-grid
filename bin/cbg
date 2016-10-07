@@ -1,0 +1,56 @@
+#!/bin/sh
+
+# Cloud BPM Grid
+
+HELP="""
+Usage: cbg COMMAND [SOLUTION]
+       cbg --help
+
+Cloud BPM Grid - Business Central and Process Server integrated with Nexus artifact repository, KeyCloak authentication server and PostgreSQL DB.
+
+COMMANDS:
+    setup \t Setup the platform and download Docker images
+    build \t Build BPM Servers
+    rebuild \t Rebuild BPM Servers
+    firstStart \t [TODO] Perform all preceding tasks (setup, build, start)
+    start \t Start the platform from existing builds and Docker images
+    restart \t Restart the platform
+    open \t Open the web client in Browser
+    stop \t Stop the platform
+    clear \t Clear build data
+
+SOLUTIONS:
+    all \t Default
+    authoring \t Business Central + BPM Assets + Authentication Server + PostgreSQL DB (only for Authentication Server)
+    runtime \t Process Server + Authentication Server + PostgreSQL DB
+
+Each server can be managed with its script (e.g. PostgreSQL database via \$CBG_HOME/bin/cbg-database).
+"""
+
+if [ -n "$2" ]; then
+    SOLUTION=$2
+else
+    SOLUTION=all
+fi
+
+case $SOLUTION in
+    all)
+        platform=(cbg-artifact-repository cbg-database cbg-authentication-server cbg-bpm-assets cbg-business-central cbg-process-server)
+    ;;
+    authoring)
+        platform=(cbg-database cbg-authentication-server cbg-bpm-assets cbg-business-central)
+    ;;
+    runtime)
+        platform=(cbg-database cbg-authentication-server cbg-process-server)
+    ;;
+    *)
+    echo -e "$HELP"
+    exit
+    ;;
+esac
+
+for p in "${platform[@]}"
+do
+    $CBG_HOME/bin/$p $1
+done
+

@@ -1,0 +1,63 @@
+#!/bin/sh
+
+source $CBG_HOME/conf/base.cfg
+
+# Cloud BPM Grid - Database
+
+HELP="""
+Usage: cbg-database COMMAND
+       cbg-database --help
+
+Database PostgreSQL for Cloud BPM Grid.
+
+COMMANDS:
+    setup \t Create persistent storage for Database and download postgres Docker image
+    start \t Start PostgreSQL database in Docker container
+    restart \t Restart PostgreSQL database in Docker container
+    stop \t Stop PostgreSQL database in Docker container
+    clear \t Clear persistent storage for Database
+"""
+
+if [ -d "$DB_DIR" ]; then
+    DB_IN_MEM=true
+fi
+
+function startDatabase {
+    if [ "$DB_IN_MEM" = true ] ; then
+        docker run -p $DB_PORT:5432 --name bpm-database -e POSTGRES_DB=$DB_NAME -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PWD -e POSTGRES_ROOT_PASSWORD=rootman1234! -d postgres
+    else
+        docker run -p $DB_PORT:5432 --name bpm-database -e POSTGRES_DB=$DB_NAME -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PWD -e POSTGRES_ROOT_PASSWORD=rootman1234! -v $DB_DIR:/var/lib/postgresql/data -d postgres
+    fi
+}
+
+case $1 in
+    setup)
+        if [ -n "$DB_DIR" ]; then
+            rm -rf $DB_DIR
+            mkdir -p -m 777 $DB_DIR
+        fi
+        docker pull postgres
+    ;;
+    build|rebuild)
+        # nothing to do
+    ;;
+    start)
+        startDatabase
+    ;;
+    restart)
+        docker rm -f bpm-database
+        startDatabase
+    ;;
+    stop)
+        docker rm -f bpm-database
+    ;;
+    clear)
+        if [ -n "$DB_DIR" ]; then
+            rm -rf $DB_DIR
+        fi
+    ;;
+    *)
+    echo -e "$HELP"
+    ;;
+esac
+

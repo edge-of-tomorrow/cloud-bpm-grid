@@ -1,0 +1,65 @@
+#!/bin/sh
+
+source $CBG_HOME/conf/base.cfg
+
+# Cloud BPM Grid - Process Server
+
+HELP="""
+Usage: cbg-process-server COMMAND
+       cbg-process-server --help
+
+Process Server for Cloud BPM Grid.
+
+COMMANDS:
+    setup \t No-op
+    build \t Build Swarm Fat-jar package of Process Server
+    rebuild \t Rebuild Swarm Fat-jar package of Process Server
+    start \t Start Process Server
+    restart \t Restart Process Server
+    open \t Open Process Server in Browser
+    stop \t Stop Process Server
+    clear \t Clear build data
+"""
+
+case $1 in
+    setup)
+        # nothing to do
+    ;;
+    build|rebuild)
+        cd $CBG_HOME/process-server
+            mvn clean package
+        cd -
+    ;;
+    start)
+        cd $CBG_HOME/process-server
+            bash -c "exec -a <process-server> java -Dorg.kie.server.id=$PROCESS_SERVER_ID -Dorg.kie.server.location=http://$PROCESS_SERVER_HOST:$PROCESS_SERVER_PORT/kie-server/rest/server -Dswarm.http.port=$PROCESS_SERVER_PORT -Dorg.kie.server.controller=http://$BC_HOST:$BC_PORT/business-central/rest/controller -Dorg.kie.server.controller.user=$BUSINESS_CENTRAL_CONTROLLER_USER -Dorg.kie.server.controller.pwd=$BUSINESS_CENTRAL_CONTROLLER_PWD -Dkie.maven.settings.custom=$PROCESS_SERVER_M2_SETTINGS -Dorg.kie.server.inmemory=$PROCESS_SERVER_INMEM -Dorg.kie.server.db.host=$DB_HOST -Dorg.kie.server.db.port=$DB_PORT -Dorg.kie.server.db.name=$DB_NAME -Dorg.kie.server.db.username=$DB_USER -Dorg.kie.server.db.password=$DB_PWD -jar target/process-server-1.0-SNAPSHOT-swarm.jar"
+        cd -
+    ;;
+    restart)
+        kill $(pidof $PROCESS_SERVER_ID)
+        cd $CBG_HOME/process-server
+            bash -c "exec -a <process-server> java -Dorg.kie.server.id=$PROCESS_SERVER_ID -Dorg.kie.server.location=http://$PROCESS_SERVER_HOST:$PROCESS_SERVER_PORT/kie-server/rest/server -Dswarm.http.port=$PROCESS_SERVER_PORT -Dorg.kie.server.controller=http://$BC_HOST:$BC_PORT/business-central/rest/controller -Dorg.kie.server.controller.user=$BUSINESS_CENTRAL_CONTROLLER_USER -Dorg.kie.server.controller.pwd=$BUSINESS_CENTRAL_CONTROLLER_PWD -Dkie.maven.settings.custom=$PROCESS_SERVER_M2_SETTINGS -Dorg.kie.server.inmemory=$PROCESS_SERVER_INMEM -Dorg.kie.server.db.host=$DB_HOST -Dorg.kie.server.db.port=$DB_PORT -Dorg.kie.server.db.name=$DB_NAME -Dorg.kie.server.db.username=$DB_USER -Dorg.kie.server.db.password=$DB_PWD -jar target/process-server-1.0-SNAPSHOT-swarm.jar"
+        cd -
+    ;;
+    open)
+        if which xdg-open > /dev/null
+        then
+          xdg-open "http://$PROCESS_SERVER_HOST:$PROCESS_SERVER_PORT"
+        elif which gnome-open > /dev/null
+        then
+          gnome-open "http://$PROCESS_SERVER_HOST:$PROCESS_SERVER_PORT"
+        fi
+    ;;
+    stop)
+        kill $(pidof process-server)
+    ;;
+    clear)
+        cd $CBG_HOME/process-server
+            mvn clean
+        cd -
+    ;;
+    *)
+    echo -e "$HELP"
+    ;;
+esac
+

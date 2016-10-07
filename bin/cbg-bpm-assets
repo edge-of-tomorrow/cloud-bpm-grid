@@ -1,0 +1,61 @@
+#!/bin/sh
+
+source $CBG_HOME/conf/base.cfg
+
+# Cloud BPM Grid - BPM Assets
+
+HELP="""
+Usage: cbg-authentication-server COMMAND
+       cbg-authentication-server --help
+
+BPM Assets for Cloud BPM Grid.
+
+COMMANDS:
+    setup \t No-op
+    start \t Start KeyCloak authentication server in Docker container
+    restart \t Restart KeyCloak authentication server in Docker container
+    stop \t Stop KeyCloak authentication server in Docker container
+    clear \t No-op
+"""
+
+cloneRepositories() {
+    if [ -n "$ASSETS_SYSTEM_REPO" ]; then
+        git clone --mirror $ASSETS_SYSTEM_REPO $ASSETS_DIR/system.git
+    fi
+    IFS=',' read -a repos <<< "$ASSETS_REPOSITORIES"
+    cd $ASSETS_DIR
+    for repo in "${repos[@]}"
+    do
+        git clone --mirror $repo
+    done
+    cd -
+}
+
+case $1 in
+    setup)
+        if [ -d "$ASSETS_DIR" ]; then
+            rm -rf $ASSETS_DIR
+        fi
+        mkdir -p -m 777 $ASSETS_DIR
+    ;;
+    build|rebuild)
+        # nothing to do
+    ;;
+    start)
+        cloneRepositories
+    ;;
+    restart)
+        rm -rf $ASSETS_DIR
+        cloneRepositories
+    ;;
+    stop)
+        # nothing to do
+    ;;
+    clear)
+        rm -rf $ASSETS_DIR
+    ;;
+    *)
+    echo -e "$HELP"
+    ;;
+esac
+
