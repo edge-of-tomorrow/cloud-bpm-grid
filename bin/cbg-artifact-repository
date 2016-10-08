@@ -48,7 +48,7 @@ case $1 in
         fi
     ;;
     status)
-        isDocker=`docker images | grep ^sonatype/nexus3`
+        isDocker=`docker images | grep "^\(docker\.io\/\)\?sonatype/nexus3"`
         if curl --output /dev/null --silent --head --fail "http://$NEXUS_HOST:$NEXUS_PORT"
         then
             echo -e "artifact-repository \t ${CBG_BLUE}running${CBG_NC}"

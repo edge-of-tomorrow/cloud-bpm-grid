@@ -55,7 +55,7 @@ case $1 in
         elif [ -f "$CBG_HOME/process-server/target/process-server-1.0-SNAPSHOT-swarm.jar" ] ; then
             echo -e "process-server \t\t ${CBG_GREEN}ready to start${CBG_NC}"
         else
-            echo -e "process-server \t\t ${CBG_RED}new (needs setup)${CBG_NC}"
+            echo -e "process-server \t\t ${CBG_RED}new (needs setup and build)${CBG_NC}"
         fi
     ;;
     stop)

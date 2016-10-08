@@ -49,14 +49,14 @@ case $1 in
         fi
     ;;
     status)
-        isDocker=`docker images | grep ^kie/business-central`
+        isDocker=`docker images | grep "^\(docker\.io\/\)\?kie/business-central"`
         if curl --output /dev/null --silent --head --fail "http://$BC_HOST:$BC_PORT/business-central"
         then
             echo -e "business-central \t ${CBG_BLUE}running${CBG_NC}"
         elif [ -n "$isDocker" ] ; then
             echo -e "business-central \t ${CBG_GREEN}ready to start${CBG_NC}"
         else
-            echo -e "business-central \t ${CBG_RED}new (needs setup)${CBG_NC}"
+            echo -e "business-central \t ${CBG_RED}new (needs setup and build)${CBG_NC}"
         fi
     ;;
     stop)
