@@ -31,7 +31,7 @@ case $1 in
         docker rmi -f kie/business-central > /dev/null 2>&1
         echo "[Business Central] Building web archive and creating new Docker image kie/business-central..."
         cd $CBG_HOME/business-central
-        mvn clean package
+        mvn clean package -Dauth.host=$AUTH_HOST -Dauth.port=$AUTH_PORT -Dauth.realm=$AUTH_REALM -Dauth.public.key=$AUTH_PUBLIC_KEY -Dauth.business.central.secret=$AUTH_BUSINESS_CENTRAL_SECRET
         cd - > /dev/null
     ;;
     start|restart)
