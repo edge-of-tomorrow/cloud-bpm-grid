@@ -24,19 +24,20 @@ COMMANDS:
 
 case $1 in
     setup)
-        # nothing to do
+        mkdir $CBG_HOME/logs > /dev/null 2>&1
     ;;
     build|rebuild)
         echo "[Process Server] Building Swarm Fat-jar package of Process Server..."
         cd $CBG_HOME/process-server
-            mvn clean package -Dauth.host=$AUTH_HOST -Dauth.port=$AUTH_PORT -Dauth.realm=$AUTH_REALM -Dauth.public.key=$AUTH_PUBLIC_KEY -Dauth.process.server.secret=$AUTH_PROCESS_SERVER_SECRET
+            mvn package -Pwar -Dauth.host=$AUTH_HOST -Dauth.port=$AUTH_PORT -Dauth.realm=$AUTH_REALM -Dauth.public.key=$AUTH_PUBLIC_KEY -Dauth.process.server.secret=$AUTH_PROCESS_SERVER_SECRET
+            mvn package -Pswarm
         cd - > /dev/null
     ;;
     start|restart)
         kill $(pidof $PROCESS_SERVER_ID) > /dev/null 2>&1
         cd $CBG_HOME/process-server
             echo "[Process Server] Starting new Process Server $PROCESS_SERVER_ID..."
-            nohup bash -c "exec -a $PROCESS_SERVER_ID java -Dorg.kie.server.id=$PROCESS_SERVER_ID -Dorg.kie.server.location=http://$PROCESS_SERVER_HOST:$PROCESS_SERVER_PORT/kie-server/rest/server -Dswarm.http.port=$PROCESS_SERVER_PORT -Dorg.kie.server.controller=http://$BC_HOST:$BC_PORT/business-central/rest/controller -Dorg.kie.server.controller.user=$BUSINESS_CENTRAL_CONTROLLER_USER -Dorg.kie.server.controller.pwd=$BUSINESS_CENTRAL_CONTROLLER_PWD -Dkie.maven.settings.custom=$PROCESS_SERVER_M2_SETTINGS -Dorg.kie.server.inmemory=$PROCESS_SERVER_INMEM -Dorg.kie.server.db.host=$DB_HOST -Dorg.kie.server.db.port=$DB_PORT -Dorg.kie.server.db.name=$DB_NAME -Dorg.kie.server.db.username=$DB_USER -Dorg.kie.server.db.password=$DB_PWD -jar target/process-server-1.0-SNAPSHOT-swarm.jar" &>/dev/null &
+            nohup bash -c "exec -a $PROCESS_SERVER_ID java -Dorg.kie.server.id=$PROCESS_SERVER_ID -Dorg.kie.server.location=http://$PROCESS_SERVER_HOST:$PROCESS_SERVER_PORT/kie-server/rest/server -Dswarm.http.port=$PROCESS_SERVER_PORT -Dorg.kie.server.controller=http://$BC_HOST:$BC_PORT/business-central/rest/controller -Dorg.kie.server.controller.user=$BUSINESS_CENTRAL_CONTROLLER_USER -Dorg.kie.server.controller.pwd=$BUSINESS_CENTRAL_CONTROLLER_PWD -Dkie.maven.settings.custom=$PROCESS_SERVER_M2_SETTINGS -Dorg.kie.server.inmemory=$PROCESS_SERVER_INMEM -Dorg.kie.server.db.host=$DB_HOST -Dorg.kie.server.db.port=$DB_PORT -Dorg.kie.server.db.name=$DB_NAME -Dorg.kie.server.db.username=$DB_USER -Dorg.kie.server.db.password=$DB_PWD -jar target/process-server-1.0-SNAPSHOT-swarm.jar" &> $CBG_HOME/logs/$PROCESS_SERVER_ID.log &
         cd - > /dev/null
     ;;
     open)
@@ -52,7 +53,7 @@ case $1 in
         if curl --output /dev/null --silent --head --fail "http://$PROCESS_SERVER_HOST:$PROCESS_SERVER_PORT/kie-server/docs"
         then
             echo -e "process-server \t\t ${CBG_BLUE}running${CBG_NC}"
-        elif [ -f "$CBG_HOME/process-server/target/process-server-1.0-SNAPSHOT-swarm.jar" ] ; then
+        elif [ -f "$CBG_HOME/process-server/target/process-server-1.0-SNAPSHOT-swarm.jar" ] && [ -d $CBG_HOME/logs ] ; then
             echo -e "process-server \t\t ${CBG_GREEN}ready to start${CBG_NC}"
         else
             echo -e "process-server \t\t ${CBG_RED}new (needs setup and build)${CBG_NC}"
@@ -60,8 +61,10 @@ case $1 in
     ;;
     stop)
         ps_pid=`pidof $PROCESS_SERVER_ID`
-        echo "[Process Server] Killing Process Server $PROCESS_SERVER_ID with PID $ps_pid..."
-        kill $ps_pid > /dev/null 2>&1
+        if [ -n "${ps_pid}" ]; then
+            echo "[Process Server] Killing Process Server $PROCESS_SERVER_ID with PID $ps_pid..."
+            kill $ps_pid > /dev/null 2>&1
+        fi
     ;;
     clear)
         cd $CBG_HOME/process-server

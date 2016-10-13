@@ -30,7 +30,7 @@
   <dependencySets>
     <dependencySet>
       <includes>
-        <include>org.kie.server:kie-server</include>
+        <include>org.kie.server:kie-server:war:ee7:7.0.0-SNAPSHOT</include>
       </includes>
       <outputDirectory>.</outputDirectory>
       <unpack>true</unpack>

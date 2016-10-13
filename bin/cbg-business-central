@@ -24,7 +24,7 @@ COMMANDS:
 
 case $1 in
     setup)
-        # nothing to do
+        mkdir $CBG_HOME/logs > /dev/null 2>&1
     ;;
     build|rebuild)
         docker rm -f business-central > /dev/null 2>&1
@@ -37,6 +37,7 @@ case $1 in
     start|restart)
         docker rm -f business-central > /dev/null 2>&1
         echo "[Business Central] Starting new business-central Docker container..."
+        # TODO put logs to $CBG_HOME/logs
         docker run -d -p $BC_PORT:8080 --net="host" --name business-central -v $ASSETS_DIR:/opt/jboss/wildfly/bin/.niogit kie/business-central > /dev/null
     ;;
     open)

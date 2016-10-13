@@ -1,8 +1,6 @@
 package org.kie.server.swarm.bpm;
 
 import java.io.File;
-import java.io.InputStream;
-import java.util.Arrays;
 
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ClassLoaderAsset;
@@ -59,15 +57,9 @@ public class ProcessServerMain {
         container.fraction(TransactionsFraction.createDefaultFraction());
 
         System.out.println("\tBuilding kie server deployable...");
-        String warPath = "/m2repo/org/kie/server/kie-server/7.0.0-SNAPSHOT/kie-server-7.0.0-SNAPSHOT-ee7.war";
         File war = new File("target/kie-server-1.0-SNAPSHOT.war");
-        //InputStream war = ProcessServerMain.class.getResourceAsStream(warPath);
-        //if (war == null) {
-        //    System.out.println("Cannot find " + warPath);
-        //}
         WebArchive deployment = ShrinkWrap.create(ZipImporter.class, "kie-server.war").importFrom(war).as(
                 WebArchive.class);
-        
         ClassLoaderAsset webxml = new ClassLoaderAsset("/config/web/web.xml", ProcessServerMain.class.getClassLoader());
         deployment.addAsWebInfResource(webxml, "web.xml");
         deployment.as(Secured.class);

@@ -18,3 +18,4 @@ target/
 # Others
 process-server-1.xml
 persistent-storage
+logs
