@@ -9,7 +9,7 @@
   <name>Cloud BPM Grid - Business Central</name>
   
   <properties>
-    <kie.version>7.0.0-SNAPSHOT</kie.version>
+    <kie.version>7.0.0.Beta2</kie.version>
   </properties>
   
   <dependencyManagement>

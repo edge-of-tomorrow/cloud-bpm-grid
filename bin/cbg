@@ -12,7 +12,6 @@ COMMANDS:
     setup \t Setup the platform and download Docker images
     build \t Build BPM Servers
     rebuild \t Rebuild BPM Servers
-    firstStart \t [TODO] Perform all preceding tasks (setup, build, start)
     start \t Start the platform from existing builds and Docker images
     restart \t Restart the platform
     open \t Open the web client in Browser
@@ -52,5 +51,9 @@ esac
 for p in "${platform[@]}"
 do
     $CBG_HOME/bin/$p $1
+    if [ "$1" == "start" ] || [ "$1" == "restart" ]; then
+        echo "[CBG] Waiting 15s to finish the previous step..."
+        sleep 15
+    fi
 done
 

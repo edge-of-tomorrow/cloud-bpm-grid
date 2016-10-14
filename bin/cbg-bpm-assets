@@ -45,7 +45,7 @@ case $1 in
         # nothing to do
     ;;
     start)
-        if [ ! -d "$ASSETS_DIR" ]; then
+        if [ $(find $ASSETS_DIR -maxdepth 0 -type d -empty 2>/dev/null) ]; then
             cloneRepositories
         fi
     ;;
