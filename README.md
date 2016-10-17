@@ -41,3 +41,12 @@ bpm-assets            | Git repositories
 business-central      | JBpm Workbench in Wildfly Docker image
 process-server        | JBpm Kie Server in Wildfly Swarm
 
+## Known Issues
+
+Sometimes login page for Business Central is empty - that's because bpmgrid realm wasn't imported in 30s and it's necessary to do it once again:
+
+```sh
+cbg-authentication-server stop
+cbg-authentication-server start
+```
+
