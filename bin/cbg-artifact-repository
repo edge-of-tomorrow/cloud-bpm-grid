@@ -23,8 +23,8 @@ COMMANDS:
 case $1 in
     setup)
         echo "[Artifact Repository] Setting up Nexus Data persistent storage..."
-        if [ -n "$NEXUS_DATA" ]; then
-            rm -rf $NEXUS_DATA
+        if [ -d "$NEXUS_DATA" ]; then
+            sudo rm -rf $NEXUS_DATA
         fi
         mkdir -p -m 777 $NEXUS_DATA
         echo "[Artifact Repository] Pulling latest Nexus 3 Docker image..."

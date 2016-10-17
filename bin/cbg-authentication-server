@@ -35,8 +35,8 @@ case $1 in
             if [ "$DB_INIT" = true ] ; then
                 echo "[Authentication Server] Importing realm.json to authentication-server ..."
                 docker run -d -p $AUTH_PORT:8080 --link bpm-database:postgres -v $AUTH_REALM_CONF:/opt/jboss/keycloak.json -e POSTGRES_DATABASE=$DB_NAME -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PWD -e KEYCLOAK_USER=$AUTH_USER -e KEYCLOAK_PASSWORD=$AUTH_PWD --name authentication-server jboss/keycloak-postgres -Dkeycloak.import=/opt/jboss/keycloak.json > /dev/null
-                echo "[Authentication Server] Waiting 15s for the import..."
-                sleep 15
+                echo "[Authentication Server] Waiting 30s for the authentication server to import..."
+                sleep 30
                 docker rm -f authentication-server > /dev/null 2>&1
                 echo "[Authentication Server] Starting new authentication-server Docker container..."
                 docker run -d -p $AUTH_PORT:8080 --link bpm-database:postgres -v $AUTH_REALM_CONF:/opt/jboss/keycloak.json -e POSTGRES_DATABASE=$DB_NAME -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PWD -e KEYCLOAK_USER=$AUTH_USER -e KEYCLOAK_PASSWORD=$AUTH_PWD --name authentication-server jboss/keycloak-postgres > /dev/null

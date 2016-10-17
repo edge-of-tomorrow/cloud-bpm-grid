@@ -16,7 +16,7 @@ COMMANDS:
     restart \t Restart the platform
     open \t Open the web client in Browser
     stop \t Stop the platform
-    clear \t Clear build data
+    clear \t Clear all data
 
 SOLUTIONS:
     all \t Default
@@ -51,9 +51,11 @@ esac
 for p in "${platform[@]}"
 do
     $CBG_HOME/bin/$p $1
-    if [ "$1" == "start" ] || [ "$1" == "restart" ]; then
-        echo "[CBG] Waiting 15s to finish the previous step..."
-        sleep 15
-    fi
 done
+
+if [ "$1" == "start" ] || [ "$1" == "restart" ]; then
+    echo "[CBG] Know that starting of the servers may take some time (a minute or two)..."
+    echo " - execute - cbg status"
+    cbg status
+fi
 

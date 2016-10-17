@@ -29,7 +29,7 @@ case $1 in
     setup)
         echo "[Database] Setting up DB Data persistent storage..."
         if [ -n "$DB_DIR" ]; then
-            rm -rf $DB_DIR
+            sudo rm -rf $DB_DIR
             mkdir -p -m 777 $DB_DIR
         fi
         echo "[Database] Pulling latest PostgreSQL Docker image..."
@@ -49,6 +49,8 @@ case $1 in
             docker run -p $DB_PORT:5432 --name bpm-database -e POSTGRES_DB=$DB_NAME -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PWD -e POSTGRES_ROOT_PASSWORD=rootman1234! -v $DB_DIR:/var/lib/postgresql/data -d postgres > /dev/null
         fi
         echo "- jdbc:postgresql://$DB_HOST:$DB_PORT/$DB_NAME"
+        echo "[Database] Waiting 10s for the database to start..."
+        sleep 10
     ;;
     status)
         isDBStorage=false
@@ -73,7 +75,7 @@ case $1 in
     clear)
         echo "[Database] Removing DB Data persistent storage..."
         if [ -n "$DB_DIR" ]; then
-            rm -rf $DB_DIR
+            sudo rm -rf $DB_DIR
         fi
     ;;
     *)
