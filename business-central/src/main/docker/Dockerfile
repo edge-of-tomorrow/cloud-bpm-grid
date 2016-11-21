@@ -5,7 +5,7 @@ FROM jboss/wildfly:10.1.0.Final
 MAINTAINER "Ivo Bek" "ibek@redhat.com"
 
 ####### ENVIRONMENT ############
-ENV JAVA_OPTS -XX:MaxPermSize=256m -Xms256m -Xmx512m
+ENV JAVA_OPTS -XX:MaxPermSize=256m -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true
 ENV JBOSS_BIND_ADDRESS 0.0.0.0
 ENV BUSINESS_CENTRAL_VERSION 7.0.0-SNAPSHOT
 ENV BUSINESS_CENTRAL_WAR kie-wb-1.0-SNAPSHOT.war
