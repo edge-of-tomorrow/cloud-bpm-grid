@@ -57,7 +57,7 @@ case $1 in
         isDBStorage=false
         isDocker=`docker images | grep "^\(docker\.io\/\)\?postgres"`
         isRunning=`docker ps | grep "\ postgres.*Up"`
-        if [ -n "$DB_DIR"] || [ "$DB_IN_MEM" = true]; then
+        if [ -n "$DB_DIR" ] || [ "$DB_IN_MEM" = true ]; then
             isDBStorage=true
         fi
         if [ -n "$isRunning" ]
