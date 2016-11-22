@@ -28,9 +28,10 @@ fi
 case $1 in
     setup)
         echo "[Database] Setting up DB Data persistent storage..."
-        if [ -n "$DB_DIR" ]; then
+        if [ "$DB_IN_MEM" = false ]; then
             sudo rm -rf $DB_DIR
             mkdir -p -m 777 $DB_DIR
+            chgrp docker $DB_DIR
         fi
         echo "[Database] Pulling latest PostgreSQL Docker image..."
         docker pull postgres > /dev/null 2>&1

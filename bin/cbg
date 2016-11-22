@@ -54,7 +54,7 @@ do
 done
 
 if [ "$1" == "start" ] || [ "$1" == "restart" ]; then
-    echo "[CBG] Know that starting of the servers may take some time (a minute or two)..."
+    echo "\n[CBG] Know that starting of the servers may take some time (a minute or two)..."
     echo " - execute - cbg status"
     cbg status
 fi

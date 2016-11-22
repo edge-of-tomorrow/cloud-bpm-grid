@@ -31,6 +31,7 @@ cloneRepositories() {
         git clone --mirror $repo > /dev/null
     done
     cd -
+    chgrp -R docker $ASSETS_DIR
 }
 
 case $1 in
@@ -40,6 +41,7 @@ case $1 in
             rm -rf $ASSETS_DIR
         fi
         mkdir -p -m 777 $ASSETS_DIR
+        chgrp docker $ASSETS_DIR
     ;;
     build|rebuild)
         # nothing to do

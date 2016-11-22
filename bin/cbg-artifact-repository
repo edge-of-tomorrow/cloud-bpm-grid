@@ -27,6 +27,7 @@ case $1 in
             sudo rm -rf $NEXUS_DATA
         fi
         mkdir -p -m 777 $NEXUS_DATA
+        chgrp docker $NEXUS_DATA
         echo "[Artifact Repository] Pulling latest Nexus 3 Docker image..."
         docker pull sonatype/nexus3 > /dev/null
     ;;
