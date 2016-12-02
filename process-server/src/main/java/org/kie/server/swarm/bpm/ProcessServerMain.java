@@ -62,6 +62,8 @@ public class ProcessServerMain {
                 WebArchive.class);
         ClassLoaderAsset webxml = new ClassLoaderAsset("/config/web/web.xml", ProcessServerMain.class.getClassLoader());
         deployment.addAsWebInfResource(webxml, "web.xml");
+        ClassLoaderAsset userInfo = new ClassLoaderAsset("/config/jbpm.user.info.properties", ProcessServerMain.class.getClassLoader());
+        deployment.addAsResource(userInfo, "jbpm.user.info.properties");
         deployment.as(Secured.class);
 
         System.out.println("\tStarting Wildfly Swarm....");

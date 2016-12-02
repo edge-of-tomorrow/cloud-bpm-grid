@@ -29,7 +29,7 @@ case $1 in
     build|rebuild)
         echo "[Process Server] Building Swarm Fat-jar package of Process Server..."
         cd $CBG_HOME/process-server
-            mvn package -Pwar -Dauth.host=$AUTH_HOST -Dauth.port=$AUTH_PORT -Dauth.realm=$AUTH_REALM -Dauth.public.key=$AUTH_PUBLIC_KEY -Dauth.process.server.secret=$AUTH_PROCESS_SERVER_SECRET
+            mvn clean package -Pwar -Dauth.host=$AUTH_HOST -Dauth.port=$AUTH_PORT -Dauth.realm=$AUTH_REALM -Dauth.public.key=$AUTH_PUBLIC_KEY -Dauth.process.server.secret=$AUTH_PROCESS_SERVER_SECRET
             mvn package -Pswarm
         cd - > /dev/null
     ;;
