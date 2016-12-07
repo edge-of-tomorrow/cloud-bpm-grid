@@ -7,6 +7,8 @@ Solutions:
 2. **Runtime** - Process Server + Authentication Server + PostgreSQL DB
 3. **Complete** - Authoring + Runtime
 
+See all [out of the box features on wiki](https://github.com/edge-of-tomorrow/cloud-bpm-grid/wiki/Features).
+
 ## Env Setup
 
 Prerequisites - Maven 3.2.5+, JDK 1.8, **Docker** (1.10.3)
@@ -14,6 +16,8 @@ Prerequisites - Maven 3.2.5+, JDK 1.8, **Docker** (1.10.3)
 export CBG_HOME=[path to the root of this repository]
 export PATH=$PATH:$CBG_HOME/bin
 ```
+
+Set all configuration in a single file ```conf/base.cfg```.
 
 ## Usage
 
@@ -30,16 +34,18 @@ cbg COMMAND [SOLUTION=all|authoring|runtime]
 
 > To get status of the platform execute ```cbg status```
 
-## Projects
+## Architecture
 
 Component             | Project
 --------------------- | ---------------------------------------
-artifact-repository   | Nexus 3
+artifact-repository   | Nexus 3 latest Docker image
 database              | PostgreSQL latest Docker image
 authentication-server | KeyCloak latest Docker image 
 bpm-assets            | Git repositories
 business-central      | JBpm Workbench in Wildfly Docker image
 process-server        | JBpm Kie Server in Wildfly Swarm
+
+![Cloud BPM Grid Architecture](https://github.com/edge-of-tomorrow/cloud-bpm-grid/raw/master/doc/architecture.png "Cloud BPM Grid Architecture")
 
 ## Known Issues
 
