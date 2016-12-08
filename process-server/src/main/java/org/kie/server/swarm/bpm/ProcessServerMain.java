@@ -9,6 +9,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.wildfly.swarm.Swarm;
 import org.wildfly.swarm.datasources.DatasourcesFraction;
 import org.wildfly.swarm.keycloak.Secured;
+import org.wildfly.swarm.mail.MailFraction;
 import org.wildfly.swarm.transactions.TransactionsFraction;
 
 public class ProcessServerMain {
@@ -53,6 +54,12 @@ public class ProcessServerMain {
             System.setProperty("org.kie.server.persistence.ds", "java:jboss/datasources/PostgreDS");
             
         }
+        
+        // configure mail server
+
+        container.fraction(MailFraction.defaultFraction()); // localhost:25
+        System.setProperty("org.kie.mail.session", "java:jboss/mail/Default");
+        
         // configure transactions
         container.fraction(TransactionsFraction.createDefaultFraction());
 
@@ -60,10 +67,14 @@ public class ProcessServerMain {
         File war = new File("target/kie-server-1.0-SNAPSHOT.war");
         WebArchive deployment = ShrinkWrap.create(ZipImporter.class, "kie-server.war").importFrom(war).as(
                 WebArchive.class);
+        
         ClassLoaderAsset webxml = new ClassLoaderAsset("/config/web/web.xml", ProcessServerMain.class.getClassLoader());
         deployment.addAsWebInfResource(webxml, "web.xml");
+
         ClassLoaderAsset userInfo = new ClassLoaderAsset("/config/jbpm.user.info.properties", ProcessServerMain.class.getClassLoader());
-        deployment.addAsResource(userInfo, "jbpm.user.info.properties");
+        deployment.addAsWebInfResource(userInfo, "classes/jbpm.user.info.properties");
+        System.setProperty("org.jbpm.ht.userinfo", "db");
+        
         deployment.as(Secured.class);
 
         System.out.println("\tStarting Wildfly Swarm....");
