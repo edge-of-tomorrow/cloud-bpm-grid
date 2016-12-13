@@ -27,7 +27,7 @@ public class NotifyOwnersByEmailTaskListener extends DefaultTaskEventListener {
     private static final String MAIL_FROM = "noreply@bpm.grid";
     private static final String MAIL_SUBJECT = "[TASK] \'%s\' is awaiting your action";
     private static final String MAIL_BODY_OWNER = "You have been assigned to the task \'%s\' with ID %d. You can access it in your <a href=\"%s\">Task Inbox</a>.";
-    private static final String MAIL_BODY_POTOWNER = "You are one of the persons who can work on the task \'%s\' with ID %d. Decide with your colleages %s who will claim and complete the task in their <a href=\"%s\">Task Inbox</a>.";
+    private static final String MAIL_BODY_POTOWNER = "You are one of the persons who can work on the task \'%s\' with ID %d. Decide with your colleagues %s who will claim and complete the task in their <a href=\"%s\">Task Inbox</a>.";
     private static final String TASK_INBOX_URL = System.getProperty("org.kie.task.inbox.url", "http://localhost:8080/business-central");
     
     private Connection connection = null;
