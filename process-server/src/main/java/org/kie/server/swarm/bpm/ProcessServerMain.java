@@ -6,6 +6,7 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ClassLoaderAsset;
 import org.jboss.shrinkwrap.api.importer.ZipImporter;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.kie.server.util.NotifyOwnersByEmailTaskListener;
 import org.wildfly.swarm.Swarm;
 import org.wildfly.swarm.datasources.DatasourcesFraction;
 import org.wildfly.swarm.keycloak.Secured;
@@ -21,16 +22,6 @@ public class ProcessServerMain {
         // Configure the Datasources subsystem with a driver and a datasource
         boolean inMemory = Boolean.valueOf(System.getProperty("org.kie.server.inmemory"));
         if (inMemory) {
-            /**container.fraction(new DatasourcesFraction().jdbcDriver("h2", (d) -> {
-                d.driverClassName("org.h2.Driver");
-                d.xaDatasourceClass("org.h2.jdbcx.JdbcDataSource");
-                d.driverModuleName("com.h2database.h2");
-            }).dataSource("H2DS", (ds) -> {
-                ds.driverName("h2");
-                ds.connectionUrl("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
-                ds.userName("sa");
-                ds.password("sa");
-            }));*/
             System.setProperty("org.kie.server.persistence.dialect", "org.hibernate.dialect.H2Dialect");
             System.setProperty("org.kie.server.persistence.ds", "java:jboss/datasources/ExampleDS");
         } else {
@@ -75,6 +66,8 @@ public class ProcessServerMain {
         deployment.addAsWebInfResource(userInfo, "classes/jbpm.user.info.properties");
         System.setProperty("org.jbpm.ht.userinfo", "db");
         
+        deployment.addClass(NotifyOwnersByEmailTaskListener.class);
+
         deployment.as(Secured.class);
 
         System.out.println("\tStarting Wildfly Swarm....");
