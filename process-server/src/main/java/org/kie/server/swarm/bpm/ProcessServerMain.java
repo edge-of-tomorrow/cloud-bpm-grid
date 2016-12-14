@@ -1,12 +1,17 @@
 package org.kie.server.swarm.bpm;
 
 import java.io.File;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ClassLoaderAsset;
 import org.jboss.shrinkwrap.api.importer.ZipImporter;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.kie.server.util.NotifyOwnersByEmailTaskListener;
+import org.kie.server.util.TemplateConfiguration;
+import org.reflections.Reflections;
+import org.reflections.scanners.ResourcesScanner;
 import org.wildfly.swarm.Swarm;
 import org.wildfly.swarm.datasources.DatasourcesFraction;
 import org.wildfly.swarm.keycloak.Secured;
@@ -43,30 +48,38 @@ public class ProcessServerMain {
 
             System.setProperty("org.kie.server.persistence.dialect", "org.hibernate.dialect.PostgreSQLDialect");
             System.setProperty("org.kie.server.persistence.ds", "java:jboss/datasources/PostgreDS");
-            
+
         }
-        
+
         // configure mail server
 
         container.fraction(MailFraction.defaultFraction()); // localhost:25
         System.setProperty("org.kie.mail.session", "java:jboss/mail/Default");
-        
+
         // configure transactions
         container.fraction(TransactionsFraction.createDefaultFraction());
 
         System.out.println("\tBuilding kie server deployable...");
         File war = new File("target/kie-server-1.0-SNAPSHOT.war");
-        WebArchive deployment = ShrinkWrap.create(ZipImporter.class, "kie-server.war").importFrom(war).as(
-                WebArchive.class);
-        
+        WebArchive deployment = ShrinkWrap.create(ZipImporter.class, "kie-server.war").importFrom(war)
+                .as(WebArchive.class);
+
         ClassLoaderAsset webxml = new ClassLoaderAsset("/config/web/web.xml", ProcessServerMain.class.getClassLoader());
         deployment.addAsWebInfResource(webxml, "web.xml");
 
-        ClassLoaderAsset userInfo = new ClassLoaderAsset("/config/jbpm.user.info.properties", ProcessServerMain.class.getClassLoader());
+        ClassLoaderAsset userInfo = new ClassLoaderAsset("/config/jbpm.user.info.properties",
+                ProcessServerMain.class.getClassLoader());
         deployment.addAsWebInfResource(userInfo, "classes/jbpm.user.info.properties");
         System.setProperty("org.jbpm.ht.userinfo", "db");
-        
+
         deployment.addClass(NotifyOwnersByEmailTaskListener.class);
+        deployment.addClass(TemplateConfiguration.class);
+        //ClassLoaderAsset templates = new ClassLoaderAsset("/templates", ProcessServerMain.class.getClassLoader());
+        Set<String> templates = new Reflections("templates", new ResourcesScanner()).getResources(Pattern.compile(".*"));
+        //deployment.addAsResource(templates, "classes/templates");
+        for (String t : templates) {
+            deployment.addAsWebInfResource(new ClassLoaderAsset("/" + t, ProcessServerMain.class.getClassLoader()), "classes/" + t);
+        }
 
         deployment.as(Secured.class);
 
@@ -76,4 +89,5 @@ public class ProcessServerMain {
         System.out.println("\tDeploying kie server ....");
         container.deploy(deployment);
     }
+
 }
