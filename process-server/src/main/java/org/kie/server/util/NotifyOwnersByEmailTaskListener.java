@@ -30,7 +30,7 @@ public class NotifyOwnersByEmailTaskListener extends DefaultTaskEventListener {
 
     private static final String MAIL_HOST = "localhost";
     private static final String MAIL_PORT = "25";
-    private static final String MAIL_FROM = "noreply@bpm.grid";
+    private static final String MAIL_FROM = System.getProperty("org.kie.mail.from", "noreply@bpm.grid");
     private static final String MAIL_SUBJECT = "[TASK] \'%s\' is awaiting your action";
     private static final String MAIL_OWNER_TEMPLATE = "EmailNewTaskToOwner.ftlh";
     private static final String MAIL_POTOWNER_TEMPLATE = "EmailNewTaskToPotentialOwners.ftlh";
