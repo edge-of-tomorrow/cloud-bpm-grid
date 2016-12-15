@@ -15,6 +15,8 @@ import org.jbpm.process.workitem.email.Recipients;
 import org.jbpm.process.workitem.email.SendHtml;
 import org.jbpm.services.task.commands.TaskContext;
 import org.jbpm.services.task.events.DefaultTaskEventListener;
+import org.jbpm.services.task.impl.model.GroupImpl;
+import org.jbpm.services.task.impl.model.UserImpl;
 import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.task.TaskEvent;
 import org.kie.api.task.model.Group;
@@ -26,6 +28,10 @@ import org.kie.internal.task.api.UserInfo;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
+/**
+ * Optional task input variables:
+ *  - mail_cc = userId, email2@domain.com, email3@domain.com, userId4
+ */
 public class NotifyOwnersByEmailTaskListener extends DefaultTaskEventListener {
 
     private static final String MAIL_HOST = "localhost";
@@ -35,6 +41,8 @@ public class NotifyOwnersByEmailTaskListener extends DefaultTaskEventListener {
     private static final String MAIL_OWNER_TEMPLATE = "EmailNewTaskToOwner.ftlh";
     private static final String MAIL_POTOWNER_TEMPLATE = "EmailNewTaskToPotentialOwners.ftlh";
     private static final String TASK_INBOX_URL = System.getProperty("org.kie.task.inbox.url", "http://localhost:8080/business-central");
+    private static final String MAIL_CC = "mail_cc";
+    private static final String MAIL_CC_GROUP = System.getProperty("org.kie.mail.cc.tasks.group", "CCTasks");
     
     private Connection connection = null;
     
@@ -93,8 +101,10 @@ public class NotifyOwnersByEmailTaskListener extends DefaultTaskEventListener {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        
+        List<String> ccs = getCCRecipients(task, userInfo);
 
-        Email email = buildEmail(subject, body, recipients, userInfo);
+        Email email = buildEmail(subject, body, recipients, ccs, userInfo);
         if (email != null) {
             SendHtml.sendHtml(email);
         }
@@ -118,7 +128,26 @@ public class NotifyOwnersByEmailTaskListener extends DefaultTaskEventListener {
         return recipients;
     }
     
-    private Email buildEmail(String subject, String body, List<User> recipients, UserInfo userInfo) {
+    private List<String> getCCRecipients(Task task, UserInfo userInfo) {
+        String mailCC = (String) task.getTaskData().getTaskInputVariables().get(MAIL_CC);
+        List<String> ccs = new ArrayList<>();
+        if (mailCC != null && !mailCC.isEmpty()) {
+            String[] ccsarray = mailCC.split(",");
+            for (String ca : ccsarray) {
+                ccs.add(ca);
+            }
+        }
+        Iterator<OrganizationalEntity> ccMembers = userInfo.getMembersForGroup(new GroupImpl(MAIL_CC_GROUP));
+        while (ccMembers.hasNext()) {
+            OrganizationalEntity ccUser = ccMembers.next();
+            if (ccUser instanceof User) {
+                ccs.add(ccUser.getId());
+            }
+        }
+        return ccs;
+    }
+    
+    private Email buildEmail(String subject, String body, List<User> recipients, List<String> ccs, UserInfo userInfo) {
         if (connection == null) {
             connection = new Connection();
             connection.setHost(MAIL_HOST);
@@ -142,6 +171,19 @@ public class NotifyOwnersByEmailTaskListener extends DefaultTaskEventListener {
         
         if (recipients.isEmpty()) {
             return null;
+        }
+        
+        for (String cc : ccs) {
+            Recipient recipient = new Recipient();
+            recipient.setType( "Cc" );
+            String e = null;
+            if (cc.contains("@")) {
+                e = cc;
+            } else {
+                e = userInfo.getEmailForEntity(new UserImpl(cc));
+            }
+            recipient.setEmail(e);
+            recs.addRecipient(recipient);
         }
         
         message.setRecipients(recs);
