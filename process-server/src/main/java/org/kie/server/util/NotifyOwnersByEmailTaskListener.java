@@ -24,6 +24,8 @@ import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.User;
 import org.kie.internal.task.api.UserInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -33,6 +35,8 @@ import freemarker.template.Template;
  *  - mail_cc = userId, email2@domain.com, email3@domain.com, userId4
  */
 public class NotifyOwnersByEmailTaskListener extends DefaultTaskEventListener {
+
+    private static final Logger LOG = LoggerFactory.getLogger(NotifyOwnersByEmailTaskListener.class);
 
     private static final String MAIL_HOST = "localhost";
     private static final String MAIL_PORT = "25";
@@ -72,7 +76,7 @@ public class NotifyOwnersByEmailTaskListener extends DefaultTaskEventListener {
             try {
                 temp = cfg.getTemplate(MAIL_OWNER_TEMPLATE);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOG.error("Template " + MAIL_OWNER_TEMPLATE + " wasn't loaded.", ex);
             }
         } else {
             recipients = getPotentialOwners(task, userInfo);
@@ -81,17 +85,21 @@ public class NotifyOwnersByEmailTaskListener extends DefaultTaskEventListener {
             }
             List<String> colleagues = new ArrayList<>();
             for (User user : recipients) {
-                colleagues.add(userInfo.getDisplayName(user));
+                String name = userInfo.getDisplayName(user);
+                if (name == null || name.isEmpty()) {
+                    LOG.warn("User " + user.getId() + " doesn't have a name set in UserInfo (KeyCloak).");
+                    colleagues.add(user.getId());
+                } else {
+                    colleagues.add(name);
+                }
             }
             try {
                 temp = cfg.getTemplate(MAIL_POTOWNER_TEMPLATE);
                 dataModel.put("colleagues", colleagues);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOG.error("Template " + MAIL_POTOWNER_TEMPLATE + " wasn't loaded.", ex);
+                return;
             }
-        }
-        if (temp == null) {
-            return;
         }
         
         try {
@@ -166,10 +174,13 @@ public class NotifyOwnersByEmailTaskListener extends DefaultTaskEventListener {
                 recipient.setEmail(e);
                 recipient.setType( "To" );
                 recs.addRecipient(recipient);
+            } else {
+                LOG.warn("User " + user.getId() + " doesn't have an email set in UserInfo (KeyCloak).");
             }
         }
         
         if (recipients.isEmpty()) {
+            LOG.warn("Couldn't send new task notification email due to no recipients.");
             return null;
         }
         
@@ -182,8 +193,10 @@ public class NotifyOwnersByEmailTaskListener extends DefaultTaskEventListener {
             } else {
                 e = userInfo.getEmailForEntity(new UserImpl(cc));
             }
-            recipient.setEmail(e);
-            recs.addRecipient(recipient);
+            if (e != null) {
+                recipient.setEmail(e);
+                recs.addRecipient(recipient);
+            }
         }
         
         message.setRecipients(recs);

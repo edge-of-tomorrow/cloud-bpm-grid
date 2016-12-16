@@ -81,6 +81,10 @@ public class ProcessServerMain {
             deployment.addAsWebInfResource(new ClassLoaderAsset("/" + t, ProcessServerMain.class.getClassLoader()), "classes/" + t);
         }
 
+        ClassLoaderAsset logback = new ClassLoaderAsset("/config/logback.xml",
+                ProcessServerMain.class.getClassLoader());
+        deployment.addAsWebInfResource(logback, "classes/logback.xml");
+
         deployment.as(Secured.class);
 
         System.out.println("\tStarting Wildfly Swarm....");
