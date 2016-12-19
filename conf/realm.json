@@ -56,6 +56,13 @@
       "clientRole" : false,
       "containerId" : "bpmgrid"
     }, {
+      "id" : "9d6e7739-c7f2-40fb-9505-a7846148d8b9",
+      "name" : "user",
+      "scopeParamRequired" : false,
+      "composite" : false,
+      "clientRole" : false,
+      "containerId" : "bpmgrid"
+    }, {
       "id" : "c840d0a7-b35d-4588-af14-800b92877ade",
       "name" : "rest-all",
       "scopeParamRequired" : false,
@@ -243,8 +250,16 @@
       } ]
     }
   },
-  "groups" : [ ],
-  "defaultRoles" : [ "offline_access", "uma_authorization", "analyst", "rest-all", "kie-server" ],
+  "groups" : [ {
+    "id" : "dcc05c06-afb6-4157-8ac0-94d8fb247fc4",
+    "name" : "CCTasks",
+    "path" : "/CCTasks",
+    "attributes" : { },
+    "realmRoles" : [ ],
+    "clientRoles" : { },
+    "subGroups" : [ ]
+  } ],
+  "defaultRoles" : [ "offline_access", "uma_authorization", "user", "rest-all", "kie-server" ],
   "requiredCredentials" : [ "password" ],
   "passwordPolicy" : "hashIterations(20000)",
   "otpPolicyType" : "totp",
@@ -283,6 +298,9 @@
     "enabled" : true,
     "totp" : false,
     "emailVerified" : false,
+    "firstName" : "Ivo",
+    "lastName" : "Bek",
+    "email" : "ibek@email.com",
     "credentials" : [ {
       "type" : "password",
       "hashedSaltedValue" : "orrwKodwNpt42UgD2QEa97py35vkTqwYaf03M0XKR9BbPrWBvtlZbjgLwqE1DW8VvzSY9uzspvidyXMnrSZU8Q==",
@@ -298,7 +316,7 @@
     "clientRoles" : {
       "account" : [ "view-profile", "manage-account" ]
     },
-    "groups" : [ ]
+    "groups" : [ "/CCTasks" ]
   }, {
     "id" : "40193a0e-1c21-4089-810d-5b9f1f86f5ae",
     "createdTimestamp" : 1476261761373,
@@ -306,6 +324,9 @@
     "enabled" : true,
     "totp" : false,
     "emailVerified" : false,
+    "firstName" : "John",
+    "lastName" : "Smith",
+    "email" : "john@email.com",
     "credentials" : [ {
       "type" : "password",
       "hashedSaltedValue" : "5oW8QS8Z+ToXz+8SvkvOtH+KZB0nXH15Me3wGsnx83MsJpVr2FTc/SblyTnX8yLIPUOuidOyClihpTvdyXQFJQ==",
@@ -317,7 +338,7 @@
       "createdDate" : 1476261773000
     } ],
     "requiredActions" : [ ],
-    "realmRoles" : [ "offline_access", "uma_authorization", "rest-all", "analyst", "kie-server" ],
+    "realmRoles" : [ "offline_access", "uma_authorization", "rest-all", "user", "kie-server" ],
     "clientRoles" : {
       "account" : [ "view-profile", "manage-account" ]
     },
@@ -329,6 +350,9 @@
     "enabled" : true,
     "totp" : false,
     "emailVerified" : false,
+    "firstName" : "Mary",
+    "lastName" : "Starr",
+    "email" : "mary@email.com",
     "credentials" : [ {
       "type" : "password",
       "hashedSaltedValue" : "CMq0jo2cK/KQhNNuZgCbAz1lvmTNg/R1TvzV1of1oxu5ukbZ/r+XaTGyCnF1o/T2T2HhAWpfvSpFtEsi0Fk8Jw==",
