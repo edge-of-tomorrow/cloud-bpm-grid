@@ -46,13 +46,3 @@ business-central      | JBpm Workbench in Wildfly Docker image
 process-server        | JBpm Kie Server in Wildfly Swarm
 
 ![Cloud BPM Grid Architecture](https://github.com/edge-of-tomorrow/cloud-bpm-grid/raw/master/doc/architecture.png "Cloud BPM Grid Architecture")
-
-## Known Issues
-
-Sometimes login page for Business Central is empty - that's because bpmgrid realm wasn't imported in 30s and it's necessary to do it once again:
-
-```sh
-cbg-authentication-server stop
-cbg-authentication-server start
-```
-
