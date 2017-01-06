@@ -1,6 +1,6 @@
 #!/bin/sh
 
-source $CBG_HOME/conf/base.cfg
+source $CBG_HOME/bin/env.properties
 
 # Cloud BPM Grid - BPM Assets
 
@@ -37,11 +37,19 @@ cloneRepositories() {
 case $1 in
     setup)
         echo "[BPM Assets] Setting up BPM Assets persistent storage..."
-        if [ -d "$ASSETS_DIR" ]; then
-            rm -rf $ASSETS_DIR
+        if [ -d "$ASSETS_DIR" ] ; then
+            while true; do
+                read -p "[BPM Assets] BPM Assets exists, do you wish to clean it yes/no? " yn
+                case $yn in
+                    [Yy]* ) echo "[BPM Assets] Remove ASSETS_DIR=$ASSETS_DIR"; rm -rf $ASSETS_DIR; mkdir -p -m 777 $ASSETS_DIR; chgrp docker $ASSETS_DIR; break;;
+                    [Nn]* ) break;;
+                    * ) echo "Please answer yes or no.";;
+                esac
+            done
+        else
+            mkdir -p -m 777 $ASSETS_DIR
+            chgrp docker $ASSETS_DIR
         fi
-        mkdir -p -m 777 $ASSETS_DIR
-        chgrp docker $ASSETS_DIR
     ;;
     build|rebuild)
         # nothing to do

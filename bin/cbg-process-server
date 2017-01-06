@@ -1,6 +1,6 @@
 #!/bin/sh
 
-source $CBG_HOME/conf/base.cfg
+source $CBG_HOME/bin/env.properties
 
 # Cloud BPM Grid - Process Server
 
@@ -24,52 +24,54 @@ COMMANDS:
 
 case $1 in
     setup)
-        mkdir $CBG_HOME/logs > /dev/null 2>&1
+        mkdir $CBG_PROFILE_PATH/work/logs > /dev/null 2>&1
     ;;
     build|rebuild)
-        echo "[Process Server] Building Swarm Fat-jar package of Process Server..."
-        cd $CBG_HOME/process-server
-            mvn clean package -Pwar -Dauth.host=$AUTH_HOST -Dauth.port=$AUTH_PORT -Dauth.realm=$AUTH_REALM -Dauth.public.key=$AUTH_PUBLIC_KEY -Dauth.process.server.secret=$AUTH_PROCESS_SERVER_SECRET
-            mvn package -Pswarm
+        docker rm -f process-server-$CBG_PROFILE > /dev/null 2>&1
+        docker rmi -f cbg/process-server-$CBG_PROFILE > /dev/null 2>&1
+        echo "[Process Server] Building web archive and creating new Docker image cbg/process-server..."
+        cd $CBG_HOME/images/process-server
+        mvn clean package -Dcbg.profile=$CBG_PROFILE -Dauth.host=$AUTH_HOST -Dauth.port=$AUTH_PORT -Dauth.realm=$AUTH_REALM -Dauth.public.key=$AUTH_PUBLIC_KEY -Dauth.process.server.secret=$AUTH_PROCESS_SERVER_SECRET
         cd - > /dev/null
     ;;
     start|restart)
-        kill $(pidof $PROCESS_SERVER_ID) > /dev/null 2>&1
-        cd $CBG_HOME/process-server
-            echo "[Process Server] Starting new Process Server $PROCESS_SERVER_ID..."
-            nohup bash -c "exec -a $PROCESS_SERVER_ID java -Dorg.kie.server.id=$PROCESS_SERVER_ID -Dorg.kie.server.location=http://$PROCESS_SERVER_HOST:$PROCESS_SERVER_PORT/kie-server/rest/server -Dswarm.http.port=$PROCESS_SERVER_PORT -Dorg.kie.server.controller=http://$BC_HOST:$BC_PORT/business-central/rest/controller -Dorg.kie.server.controller.user=$BUSINESS_CENTRAL_CONTROLLER_USER -Dorg.kie.server.controller.pwd=$BUSINESS_CENTRAL_CONTROLLER_PWD -Dkie.maven.settings.custom=$PROCESS_SERVER_M2_SETTINGS -Dorg.kie.server.inmemory=$PROCESS_SERVER_INMEM -Dorg.kie.server.db.host=$DB_HOST -Dorg.kie.server.db.port=$DB_PORT -Dorg.kie.server.db.name=$DB_NAME -Dorg.kie.server.db.username=$DB_USER -Dorg.kie.server.db.password=$DB_PWD -Dorg.kie.task.inbox.url=$TASK_INBOX_URL -Dorg.kie.mail.from=$MAIL_FROM -jar target/process-server-1.0-SNAPSHOT-swarm.jar" &> $CBG_HOME/logs/$PROCESS_SERVER_ID.log &
-        cd - > /dev/null
+        docker rm -f process-server-$CBG_PROFILE > /dev/null 2>&1
+        echo "[Process Server] Starting new process-server Docker container..."
+        # TODO put logs to $CBG_HOME/work/logs
+        docker run -d -p $PROCESS_SERVER_PORT:8080 --net="host" --name process-server-$CBG_PROFILE -e PROCESS_SERVER_ID=$PROCESS_SERVER_ID -e PROCESS_SERVER_CONTROLLER="http://$BC_HOST:$BC_PORT/business-central/rest/controller" -e PROCESS_SERVER_M2_SETTINGS=$PROCESS_SERVER_M2_SETTINGS -e BUSINESS_CENTRAL_CONTROLLER_USER=$BUSINESS_CENTRAL_CONTROLLER_USER -e BUSINESS_CENTRAL_CONTROLLER_PWD=$BUSINESS_CENTRAL_CONTROLLER_PWD -e DB_NAME=$DB_NAME -e DB_USER=$DB_USER -e DB_PASSWORD=$DB_PASSWORD -e DB_HOST=$DB_HOST -e DB_PORT=$DB_PORT cbg/process-server-$CBG_PROFILE > /dev/null
     ;;
     open)
         if which xdg-open > /dev/null
         then
-          xdg-open "http://$PROCESS_SERVER_HOST:$PROCESS_SERVER_PORT/kie-server/docs"
+          xdg-open "http://$PROCESS_SERVER_HOST:$PROCESS_SERVER_PORT/kie-server"
         elif which gnome-open > /dev/null
         then
-          gnome-open "http://$PROCESS_SERVER_HOST:$PROCESS_SERVER_PORT/kie-server/docs"
+          gnome-open "http://$PROCESS_SERVER_HOST:$PROCESS_SERVER_PORT/kie-server"
         fi
     ;;
     status)
+        isDocker=`docker images | grep "^\(docker\.io\/\)\?cbg/process-server-$CBG_PROFILE"`
         if curl --output /dev/null --silent --head --fail "http://$PROCESS_SERVER_HOST:$PROCESS_SERVER_PORT/kie-server/docs"
         then
             echo -e "process-server \t\t ${CBG_BLUE}running${CBG_NC}"
-        elif [ -f "$CBG_HOME/process-server/target/process-server-1.0-SNAPSHOT-swarm.jar" ] && [ -d $CBG_HOME/logs ] ; then
+        elif [ -n "$isDocker" ] ; then
             echo -e "process-server \t\t ${CBG_GREEN}ready to start${CBG_NC}"
         else
             echo -e "process-server \t\t ${CBG_RED}new (needs setup and build)${CBG_NC}"
         fi
     ;;
     stop)
-        ps_pid=`pidof $PROCESS_SERVER_ID`
-        if [ -n "${ps_pid}" ]; then
-            echo "[Process Server] Killing Process Server $PROCESS_SERVER_ID with PID $ps_pid..."
-            kill $ps_pid > /dev/null 2>&1
-        fi
+        echo "[Process Server] Removing process-server Docker container..."
+        docker rm -f process-server-$CBG_PROFILE > /dev/null 2>&1
     ;;
     clear)
-        cd $CBG_HOME/process-server
-            mvn clean
+        echo "[Process Server] Cleaning Process Server project..."
+        cd $CBG_HOME/images/process-server
+        mvn clean > /dev/null
         cd - > /dev/null
+        echo "[Process Server] Removing process-server Docker container and its image..."
+        docker rm -f process-server-$CBG_PROFILE > /dev/null 2>&1
+        docker rmi -f cbg/process-server-$CBG_PROFILE > /dev/null 2>&1
     ;;
     *)
     echo -e "$HELP"

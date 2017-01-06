@@ -1,6 +1,6 @@
 #!/bin/sh
 
-source $CBG_HOME/conf/base.cfg
+source $CBG_HOME/bin/env.properties
 
 # Cloud BPM Grid - Artifact Repository
 
@@ -23,11 +23,19 @@ COMMANDS:
 case $1 in
     setup)
         echo "[Artifact Repository] Setting up Nexus Data persistent storage..."
-        if [ -d "$NEXUS_DATA" ]; then
-            sudo rm -rf $NEXUS_DATA
+        if [ -d "$NEXUS_DATA" ] ; then
+            while true; do
+                read -p "[Artifact Repository] Artifact Repository exists, do you wish to clean it yes/no? " yn
+                case $yn in
+                    [Yy]* ) echo "[Artifact Repository] Remove NEXUS_DATA=$NEXUS_DATA"; sudo rm -rf $NEXUS_DATA; mkdir -p -m 777 $NEXUS_DATA; chgrp docker $NEXUS_DATA; break;;
+                    [Nn]* ) break;;
+                    * ) echo "Please answer yes or no.";;
+                esac
+            done
+        else
+            mkdir -p -m 777 $NEXUS_DATA
+            chgrp docker $NEXUS_DATA
         fi
-        mkdir -p -m 777 $NEXUS_DATA
-        chgrp docker $NEXUS_DATA
         echo "[Artifact Repository] Pulling latest Nexus 3 Docker image..."
         docker pull sonatype/nexus3 > /dev/null
     ;;

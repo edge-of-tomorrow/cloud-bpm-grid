@@ -1,6 +1,6 @@
 #!/bin/sh
 
-source $CBG_HOME/conf/base.cfg
+source $CBG_HOME/bin/env.properties
 
 # Cloud BPM Grid - Business Central
 
@@ -24,21 +24,21 @@ COMMANDS:
 
 case $1 in
     setup)
-        mkdir $CBG_HOME/logs > /dev/null 2>&1
+        mkdir $CBG_PROFILE_PATH/work/logs > /dev/null 2>&1
     ;;
     build|rebuild)
-        docker rm -f business-central > /dev/null 2>&1
-        docker rmi -f kie/business-central > /dev/null 2>&1
-        echo "[Business Central] Building web archive and creating new Docker image kie/business-central..."
-        cd $CBG_HOME/business-central
-        mvn clean package -Dauth.host=$AUTH_HOST -Dauth.port=$AUTH_PORT -Dauth.realm=$AUTH_REALM -Dauth.public.key=$AUTH_PUBLIC_KEY -Dauth.business.central.secret=$AUTH_BUSINESS_CENTRAL_SECRET
+        docker rm -f business-central-$CBG_PROFILE > /dev/null 2>&1
+        docker rmi -f cbg/business-central-$CBG_PROFILE > /dev/null 2>&1
+        echo "[Business Central] Building web archive and creating new Docker image cbg/business-central-$CBG_PROFILE..."
+        cd $CBG_HOME/images/business-central
+        mvn clean package -Dcbg.profile=$CBG_PROFILE -Dauth.host=$AUTH_HOST -Dauth.port=$AUTH_PORT -Dauth.realm=$AUTH_REALM -Dauth.public.key=$AUTH_PUBLIC_KEY -Dauth.business.central.secret=$AUTH_BUSINESS_CENTRAL_SECRET -e
         cd - > /dev/null
     ;;
     start|restart)
-        docker rm -f business-central > /dev/null 2>&1
+        docker rm -f business-central-$CBG_PROFILE > /dev/null 2>&1
         echo "[Business Central] Starting new business-central Docker container..."
         # TODO put logs to $CBG_HOME/logs
-        docker run -d -p $BC_PORT:8080 --net="host" --name business-central -v $ASSETS_DIR:/opt/jboss/wildfly/bin/.niogit kie/business-central > /dev/null
+        docker run -d -p $BC_PORT:8080 --net="host" --name business-central-$CBG_PROFILE -v $ASSETS_DIR:/opt/jboss/wildfly/bin/.niogit cbg/business-central-$CBG_PROFILE > /dev/null
     ;;
     open)
         if which xdg-open > /dev/null
@@ -50,7 +50,7 @@ case $1 in
         fi
     ;;
     status)
-        isDocker=`docker images | grep "^\(docker\.io\/\)\?kie/business-central"`
+        isDocker=`docker images | grep "^\(docker\.io\/\)\?cbg/business-central-$CBG_PROFILE"`
         if curl --output /dev/null --silent --head --fail "http://$BC_HOST:$BC_PORT/business-central"
         then
             echo -e "business-central \t ${CBG_BLUE}running${CBG_NC}"
@@ -62,16 +62,16 @@ case $1 in
     ;;
     stop)
         echo "[Business Central] Removing business-central Docker container..."
-        docker rm -f business-central > /dev/null 2>&1
+        docker rm -f business-central-$CBG_PROFILE > /dev/null 2>&1
     ;;
     clear)
         echo "[Business Central] Cleaning Business Central project..."
-        cd $CBG_HOME/business-central
+        cd $CBG_HOME/images/business-central
         mvn clean > /dev/null
         cd - > /dev/null
         echo "[Business Central] Removing business-central Docker container and its image..."
-        docker rm -f business-central > /dev/null 2>&1
-        docker rmi -f kie/business-central > /dev/null 2>&1
+        docker rm -f business-central-$CBG_PROFILE > /dev/null 2>&1
+        docker rmi -f cbg/business-central-$CBG_PROFILE > /dev/null 2>&1
     ;;
     *)
     echo -e "$HELP"

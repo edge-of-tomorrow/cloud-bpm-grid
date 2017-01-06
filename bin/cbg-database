@@ -1,6 +1,6 @@
 #!/bin/sh
 
-source $CBG_HOME/conf/base.cfg
+source $CBG_HOME/bin/env.properties
 
 # Cloud BPM Grid - Database
 
@@ -19,17 +19,19 @@ COMMANDS:
     clear \t Remove DB Data persistent storage
 """
 
-if [ -n "$DB_DIR" ]; then
-    DB_IN_MEM=false
-else
-    DB_IN_MEM=true
-fi
-
 case $1 in
     setup)
         echo "[Database] Setting up DB Data persistent storage..."
-        if [ "$DB_IN_MEM" = false ]; then
-            sudo rm -rf $DB_DIR
+        if [ -d $DB_DIR ]; then
+            while true; do
+                read -p "[Database] Database exists, do you wish to clean it yes/no? " yn
+                case $yn in
+                    [Yy]* ) echo "[Database] Remove DB_DIR=$DB_DIR"; sudo rm -rf $DB_DIR; mkdir -p -m 777 $DB_DIR; chgrp docker $DB_DIR; break;;
+                    [Nn]* ) break;;
+                    * ) echo "Please answer yes or no.";;
+                esac
+            done
+        else
             mkdir -p -m 777 $DB_DIR
             chgrp docker $DB_DIR
         fi
@@ -42,16 +44,18 @@ case $1 in
     start|restart)
         echo "[Database] Removing bpm-database Docker container..."
         docker rm -f bpm-database > /dev/null 2>&1
-        if [ "$DB_IN_MEM" = true ] ; then
-            echo "[Database] Starting new bpm-database Docker container..."
-            docker run -p $DB_PORT:5432 --name bpm-database -e POSTGRES_DB=$DB_NAME -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PWD -e POSTGRES_ROOT_PASSWORD=rootman1234! -d postgres > /dev/null
-        else
-            echo "[Database] Starting new bpm-database Docker container in persistent storage $DB_DIR..."
-            docker run -p $DB_PORT:5432 --name bpm-database -e POSTGRES_DB=$DB_NAME -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PWD -e POSTGRES_ROOT_PASSWORD=rootman1234! -v $DB_DIR:/var/lib/postgresql/data -d postgres > /dev/null
-        fi
+        echo "[Database] Starting new bpm-database Docker container in $DB_DIR..."
+        docker run -p $DB_PORT:5432 --name bpm-database -e POSTGRES_DB=$DB_NAME -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PWD -e POSTGRES_ROOT_PASSWORD=rootman1234! -v $DB_DIR:/var/lib/postgresql/data -d postgres > /dev/null
         echo "- jdbc:postgresql://$DB_HOST:$DB_PORT/$DB_NAME"
-        echo "[Database] Waiting 10s for the database to start..."
-        sleep 10
+        echo "[Database] Waiting for the database to start..."
+        loops=0
+        while : ; do
+            isRunning=`docker ps | grep "\ postgres.*Up"`
+            [[ -z "$isRunning" ]] || break
+            [[ $loops == 10 ]] || break
+            sleep 1
+            ((loops++))
+        done
     ;;
     status)
         isDBStorage=false
