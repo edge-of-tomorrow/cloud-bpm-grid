@@ -31,14 +31,14 @@ case $1 in
         docker rmi -f cbg/process-server-$CBG_PROFILE > /dev/null 2>&1
         echo "[Process Server] Building web archive and creating new Docker image cbg/process-server..."
         cd $CBG_HOME/images/process-server
-        mvn clean package -Dcbg.profile=$CBG_PROFILE -Dauth.host=$AUTH_HOST -Dauth.port=$AUTH_PORT -Dauth.realm=$AUTH_REALM -Dauth.public.key=$AUTH_PUBLIC_KEY -Dauth.process.server.secret=$AUTH_PROCESS_SERVER_SECRET
+        mvn clean package -Dcbg.profile=$CBG_PROFILE -Dauth.host=$AUTH_HOST -Dauth.port=$AUTH_PORT -Dauth.realm=$AUTH_REALM -Dauth.public.key=$AUTH_PUBLIC_KEY -Dauth.process.server.secret=$AUTH_PROCESS_SERVER_SECRET -Dcbg.conf.dir=$CBG_PROFILE_PATH/conf
         cd - > /dev/null
     ;;
     start|restart)
         docker rm -f process-server-$CBG_PROFILE > /dev/null 2>&1
         echo "[Process Server] Starting new process-server Docker container..."
         # TODO put logs to $CBG_HOME/work/logs
-        docker run -d -p $PROCESS_SERVER_PORT:8080 --net="host" --name process-server-$CBG_PROFILE -e PROCESS_SERVER_ID=$PROCESS_SERVER_ID -e PROCESS_SERVER_CONTROLLER="http://$BC_HOST:$BC_PORT/business-central/rest/controller" -e PROCESS_SERVER_M2_SETTINGS=$PROCESS_SERVER_M2_SETTINGS -e BUSINESS_CENTRAL_CONTROLLER_USER=$BUSINESS_CENTRAL_CONTROLLER_USER -e BUSINESS_CENTRAL_CONTROLLER_PWD=$BUSINESS_CENTRAL_CONTROLLER_PWD -e DB_NAME=$DB_NAME -e DB_USER=$DB_USER -e DB_PASSWORD=$DB_PASSWORD -e DB_HOST=$DB_HOST -e DB_PORT=$DB_PORT cbg/process-server-$CBG_PROFILE > /dev/null
+        docker run -d -p $PROCESS_SERVER_PORT:8181 --net="host" --name process-server-$CBG_PROFILE -e PROCESS_SERVER_ID=$PROCESS_SERVER_ID -e PROCESS_SERVER_CONTROLLER="http://$BC_HOST:$BC_PORT/business-central/rest/controller" -e BUSINESS_CENTRAL_CONTROLLER_USER=$BUSINESS_CENTRAL_CONTROLLER_USER -e BUSINESS_CENTRAL_CONTROLLER_PWD=$BUSINESS_CENTRAL_CONTROLLER_PWD -e DB_NAME=$DB_NAME -e DB_USER=$DB_USER -e DB_PWD=$DB_PWD -e DB_HOST=$DB_HOST -e DB_PORT=$DB_PORT -e PROCESS_SERVER_HOST=$PROCESS_SERVER_HOST -e PROCESS_SERVER_PORT=$PROCESS_SERVER_PORT cbg/process-server-$CBG_PROFILE > /dev/null
     ;;
     open)
         if which xdg-open > /dev/null

@@ -6,7 +6,6 @@ MAINTAINER "Ivo Bek" "ibek@redhat.com"
 
 ####### ENVIRONMENT ############
 ENV JAVA_OPTS -XX:MaxPermSize=256m -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true
-ENV JBOSS_BIND_ADDRESS 0.0.0.0
 
 ENV BUSINESS_CENTRAL_VERSION 7.0.0-SNAPSHOT
 ENV BUSINESS_CENTRAL_WAR kie-wb-1.0-SNAPSHOT.war
@@ -25,35 +24,35 @@ echo "jboss:jboss" | chpasswd
 
 ####### BUSINESS CENTRAL & WILDFLY10 CONFIG FILES ############
 
+ADD classes/config/standalone-full-business-central.xml $JBOSS_HOME/standalone/configuration/standalone-full-business-central.xml
+
+RUN rm $JBOSS_HOME/standalone/configuration/standalone.xml && \
+mv $JBOSS_HOME/standalone/configuration/standalone-full-business-central.xml $JBOSS_HOME/standalone/configuration/standalone.xml
+
 # Install Keycloak and secure Process Server
-RUN yum -y install wget
-
-RUN wget https://downloads.jboss.org/keycloak/${KEYCLOAK_VERSION}/adapters/keycloak-oidc/keycloak-wildfly-adapter-dist-${KEYCLOAK_VERSION}.zip -O $JBOSS_HOME/keycloak-adapter.zip
-
-RUN unzip -q -d $JBOSS_HOME/ $JBOSS_HOME/keycloak-adapter.zip && \
-rm $JBOSS_HOME/keycloak-adapter.zip
-
-RUN $JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/bin/adapter-install-offline.cli
 
 ADD classes/config/secure-deployment-offline.cli $JBOSS_HOME/bin/secure-deployment-offline.cli
-RUN $JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/bin/secure-deployment-offline.cli
+
+RUN yum -y install wget && \
+yum clean all -y && \
+wget https://downloads.jboss.org/keycloak/${KEYCLOAK_VERSION}/adapters/keycloak-oidc/keycloak-wildfly-adapter-dist-${KEYCLOAK_VERSION}.zip -O $JBOSS_HOME/keycloak-adapter.zip && \
+unzip -q -d $JBOSS_HOME/ $JBOSS_HOME/keycloak-adapter.zip && \
+rm $JBOSS_HOME/keycloak-adapter.zip && \
+$JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/bin/adapter-install-offline.cli && \
+$JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/bin/secure-deployment-offline.cli
 
 # Add Business Central
 ADD ${BUSINESS_CENTRAL_WAR} $JBOSS_HOME/standalone/deployments/business-central-archive.war
 
 RUN unzip -q -d $JBOSS_HOME/standalone/deployments/business-central.war $JBOSS_HOME/standalone/deployments/business-central-archive.war && \
 touch $JBOSS_HOME/standalone/deployments/business-central.war.dodeploy && \
-rm -rf $JBOSS_HOME/standalone/deployments/business-central-archive.war
+rm $JBOSS_HOME/standalone/deployments/business-central-archive.war
 
 # Business Central Customization
 
 ADD classes/config/business-central-users.properties $JBOSS_HOME/standalone/configuration/business-central-users.properties
 ADD classes/config/business-central-roles.properties $JBOSS_HOME/standalone/configuration/business-central-roles.properties
-ADD classes/config/standalone-full-business-central.xml $JBOSS_HOME/standalone/configuration/standalone-full-business-central.xml
 ADD classes/config/settings.xml $JBOSS_HOME/bin/settings.xml
-
-RUN rm $JBOSS_HOME/standalone/configuration/standalone.xml
-RUN mv $JBOSS_HOME/standalone/configuration/standalone-full-business-central.xml $JBOSS_HOME/standalone/configuration/standalone.xml
 
 # Patch
 # ADD classes/config/jbpm-console-ng-business-domain-backend-7.0.0-SNAPSHOT.jar $JBOSS_HOME/jbpm-console-ng-business-domain-backend-7.0.0-SNAPSHOT.jar
@@ -61,19 +60,12 @@ RUN mv $JBOSS_HOME/standalone/configuration/standalone-full-business-central.xml
 # RUN mv $JBOSS_HOME/jbpm-console-ng-business-domain-backend-7.0.0-SNAPSHOT.jar $JBOSS_HOME/standalone/deployments/business-central.war/WEB-INF/lib/jbpm-console-ng-business-domain-backend-7.0.0-SNAPSHOT.jar
 
 # Set right permissions for jboss user.
-RUN chown -R jboss:jboss $JBOSS_HOME/standalone/deployments/* && \
-chmod +x $JBOSS_HOME/bin/*.sh && \
-chown jboss:jboss $JBOSS_HOME/bin/adapter-install-offline.cli && \
-chown jboss:jboss $JBOSS_HOME/bin/secure-deployment-offline.cli && \
-chown jboss:jboss $JBOSS_HOME/standalone/configuration/business-central-users.properties && \ 
-chown jboss:jboss $JBOSS_HOME/standalone/configuration/business-central-roles.properties && \
-chown jboss:jboss $JBOSS_HOME/standalone/configuration/standalone.xml && \
-chown jboss:jboss $JBOSS_HOME/bin/settings.xml && \
-chown jboss:jboss /opt/jboss/wildfly/bin/.niogit
+RUN chown -R jboss:jboss $JBOSS_HOME/* && \
+chmod +x $JBOSS_HOME/bin/*.sh
 
 # Switchback to jboss user
 USER jboss
 
 ####### COMMAND ############
 WORKDIR $JBOSS_HOME/bin/
-CMD ["./standalone.sh", "-b", "$JBOSS_BIND_ADDRESS", "-c", "standalone.xml"]
+CMD ["./standalone.sh", "-b", "0.0.0.0", "-c", "standalone.xml"]

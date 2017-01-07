@@ -142,6 +142,13 @@
                 <include>classes/config/*.*</include>
               </includes>
             </resource>
+            <resource>
+              <targetPath>/</targetPath>
+              <directory>${cbg.conf.dir}</directory>
+              <includes>
+                <include>settings.xml</include>
+              </includes>
+            </resource>
           </resources>
         </configuration>
       </plugin>

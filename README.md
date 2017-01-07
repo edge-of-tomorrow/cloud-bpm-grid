@@ -42,7 +42,7 @@ artifact-repository   | Nexus 3 latest Docker image
 database              | PostgreSQL latest Docker image
 authentication-server | KeyCloak latest Docker image 
 bpm-assets            | Git repositories
-business-central      | JBpm Workbench in Wildfly Docker image
-process-server        | JBpm Kie Server in Wildfly Swarm
+business-central      | JBPM Workbench in Wildfly 10 Docker image
+process-server        | JBPM Kie Server in Wildfly 10 Docker image
 
 ![Cloud BPM Grid Architecture](https://github.com/edge-of-tomorrow/cloud-bpm-grid/raw/master/doc/architecture.png "Cloud BPM Grid Architecture")
