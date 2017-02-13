@@ -25,7 +25,7 @@ COMMANDS:
 
 case $1 in
     setup)
-        mkdir $CBG_PROFILE_PATH/work/logs > /dev/null 2>&1
+        # nothing to do
     ;;
     build|rebuild)
         docker rm -f process-server-$CBG_PROFILE > /dev/null 2>&1
@@ -61,7 +61,7 @@ case $1 in
         elif [ -n "$isDocker" ] ; then
             echo -e "process-server \t\t ${CBG_GREEN}ready to start${CBG_NC}"
         else
-            echo -e "process-server \t\t ${CBG_RED}new (needs setup and build)${CBG_NC}"
+            echo -e "process-server \t\t ${CBG_RED}new (ready to build)${CBG_NC}"
         fi
     ;;
     stop)

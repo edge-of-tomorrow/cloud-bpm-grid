@@ -1,6 +1,6 @@
 embed-server --server-config=standalone.xml
 /subsystem=keycloak/secure-deployment=business-central.war:\
-  add(realm=${auth.realm},resource=business-central,realm-public-key=${auth.public.key},\
+  add(realm=${auth.realm},resource=business-central,\
   auth-server-url=http://${auth.host}:${auth.port}/auth,ssl-required=external,enable-basic-auth=true,principal-attribute=preferred_username)
 /subsystem=keycloak/secure-deployment=business-central.war/credential=secret:\
   add(value=${auth.business.central.secret})
