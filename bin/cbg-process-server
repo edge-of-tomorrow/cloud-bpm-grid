@@ -20,6 +20,7 @@ COMMANDS:
     status \t Show status of Process Server
     stop \t Stop Process Server
     clear \t Clear build data
+    logs \t Show logs of Process Server
 """
 
 case $1 in
@@ -38,7 +39,7 @@ case $1 in
         docker rm -f process-server-$CBG_PROFILE > /dev/null 2>&1
         echo "[Process Server] Starting new process-server Docker container..."
         # TODO put logs to $CBG_HOME/work/logs
-        docker run -d -p $PROCESS_SERVER_PORT:8181 --net="host" --name process-server-$CBG_PROFILE -e PROCESS_SERVER_ID=$PROCESS_SERVER_ID -e PROCESS_SERVER_CONTROLLER="http://$BC_HOST:$BC_PORT/business-central/rest/controller" -e BUSINESS_CENTRAL_CONTROLLER_USER=$BUSINESS_CENTRAL_CONTROLLER_USER -e BUSINESS_CENTRAL_CONTROLLER_PWD=$BUSINESS_CENTRAL_CONTROLLER_PWD -e DB_NAME=$DB_NAME -e DB_USER=$DB_USER -e DB_PWD=$DB_PWD -e DB_HOST=$DB_HOST -e DB_PORT=$DB_PORT -e PROCESS_SERVER_HOST=$PROCESS_SERVER_HOST -e PROCESS_SERVER_PORT=$PROCESS_SERVER_PORT cbg/process-server-$CBG_PROFILE > /dev/null
+        docker run -d -p $PROCESS_SERVER_PORT:8181 --net="host" --name process-server-$CBG_PROFILE -e PROCESS_SERVER_ID=$PROCESS_SERVER_ID -e PROCESS_SERVER_CONTROLLER="http://$BC_HOST:$BC_PORT/business-central/rest/controller" -e BUSINESS_CENTRAL_CONTROLLER_USER=$BUSINESS_CENTRAL_CONTROLLER_USER -e BUSINESS_CENTRAL_CONTROLLER_PWD=$BUSINESS_CENTRAL_CONTROLLER_PWD -e DB_NAME=$DB_NAME -e DB_USER=$DB_USER -e DB_PWD=$DB_PWD -e DB_HOST=$DB_HOST -e DB_PORT=$DB_PORT -e PROCESS_SERVER_HOST=$PROCESS_SERVER_HOST -e PROCESS_SERVER_PORT=$PROCESS_SERVER_PORT -e LOGGER_PACKAGE=$LOGGER_PACKAGE -e LOGGER_LEVEL=$LOGGER_LEVEL cbg/process-server-$CBG_PROFILE > /dev/null
     ;;
     open)
         if which xdg-open > /dev/null
@@ -51,9 +52,12 @@ case $1 in
     ;;
     status)
         isDocker=`docker images | grep "^\(docker\.io\/\)\?cbg/process-server-$CBG_PROFILE"`
+        isDockerRunning=`docker ps | grep "cbg/process-server-$CBG_PROFILE"`
         if curl --output /dev/null --silent --head --fail "http://$PROCESS_SERVER_HOST:$PROCESS_SERVER_PORT/kie-server/docs"
         then
             echo -e "process-server \t\t ${CBG_BLUE}running${CBG_NC}"
+        elif [ -n "$isDockerRunning" ] ; then
+            echo -e "process-server \t\t ${CBG_GREEN}starting${CBG_NC}"
         elif [ -n "$isDocker" ] ; then
             echo -e "process-server \t\t ${CBG_GREEN}ready to start${CBG_NC}"
         else
@@ -72,6 +76,9 @@ case $1 in
         echo "[Process Server] Removing process-server Docker container and its image..."
         docker rm -f process-server-$CBG_PROFILE > /dev/null 2>&1
         docker rmi -f cbg/process-server-$CBG_PROFILE > /dev/null 2>&1
+    ;;
+    logs)
+        docker exec -it process-server-$CBG_PROFILE tail -f /opt/jboss/wildfly/standalone/log/server.log
     ;;
     *)
     echo -e "$HELP"

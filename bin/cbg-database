@@ -45,7 +45,7 @@ case $1 in
         echo "[Database] Removing bpm-database Docker container..."
         docker rm -f bpm-database > /dev/null 2>&1
         echo "[Database] Starting new bpm-database Docker container in $DB_DIR..."
-        docker run -p $DB_PORT:5432 --name bpm-database -e POSTGRES_DB=$DB_NAME -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PWD -e POSTGRES_ROOT_PASSWORD=rootman1234! -v $DB_DIR:/var/lib/postgresql/data -d postgres > /dev/null
+        docker run --privileged -p $DB_PORT:5432 --name bpm-database -e POSTGRES_DB=$DB_NAME -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PWD -e POSTGRES_ROOT_PASSWORD=rootman1234! -v $DB_DIR:/var/lib/postgresql/data -d postgres > /dev/null
         echo "- jdbc:postgresql://$DB_HOST:$DB_PORT/$DB_NAME"
         echo "[Database] Waiting for the database to start..."
         loops=0
@@ -58,16 +58,12 @@ case $1 in
         done
     ;;
     status)
-        isDBStorage=false
         isDocker=`docker images | grep "^\(docker\.io\/\)\?postgres"`
         isRunning=`docker ps | grep "\ postgres.*Up"`
-        if [ -n "$DB_DIR" ] || [ "$DB_IN_MEM" = true ]; then
-            isDBStorage=true
-        fi
         if [ -n "$isRunning" ]
         then
             echo -e "database \t\t ${CBG_BLUE}running${CBG_NC}"
-        elif [ "$isDBStorage" = true ] && [ -n "$isDocker" ] ; then
+        elif [ -d "$DB_DIR" ] && [ -n "$isDocker" ] ; then
             echo -e "database \t\t ${CBG_GREEN}ready to start${CBG_NC}"
         else
             echo -e "database \t\t ${CBG_RED}new (needs setup)${CBG_NC}"

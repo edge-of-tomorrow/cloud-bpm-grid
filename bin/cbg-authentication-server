@@ -54,9 +54,12 @@ case $1 in
     ;;
     status)
         isDocker=`docker images | grep "^\(docker\.io\/\)\?jboss/keycloak-postgres"`
+        isDockerRunning=`docker ps | grep "jboss/keycloak-postgres"`
         if curl --output /dev/null --silent --head --fail "http://$AUTH_HOST:$AUTH_PORT/auth"
         then
             echo -e "authentication-server \t ${CBG_BLUE}running${CBG_NC}"
+        elif [ -n "$isDockerRunning" ] ; then
+            echo -e "authentication-server \t ${CBG_GREEN}starting${CBG_NC}"
         elif [ -n "$isDocker" ] ; then
             echo -e "authentication-server \t ${CBG_GREEN}ready to start${CBG_NC}"
         else

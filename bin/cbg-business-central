@@ -20,6 +20,7 @@ COMMANDS:
     status \t Show status of Business Central
     stop \t Stop Business Central in Docker container
     clear \t Clear build data and Business Central Docker image
+    logs \t Show logs of Business Central
 """
 
 case $1 in
@@ -38,7 +39,7 @@ case $1 in
         docker rm -f business-central-$CBG_PROFILE > /dev/null 2>&1
         echo "[Business Central] Starting new business-central Docker container..."
         # TODO put logs to $CBG_HOME/logs
-        docker run -d -p $BC_PORT:8080 --net="host" --name business-central-$CBG_PROFILE -v $ASSETS_DIR:/opt/jboss/wildfly/bin/.niogit cbg/business-central-$CBG_PROFILE > /dev/null
+        docker run --privileged -d -p $BC_PORT:8080 --net="host" --name business-central-$CBG_PROFILE -v $ASSETS_DIR:/opt/jboss/wildfly/bin/.niogit cbg/business-central-$CBG_PROFILE > /dev/null
     ;;
     open)
         if which xdg-open > /dev/null
@@ -51,9 +52,12 @@ case $1 in
     ;;
     status)
         isDocker=`docker images | grep "^\(docker\.io\/\)\?cbg/business-central-$CBG_PROFILE"`
+        isDockerRunning=`docker ps | grep "cbg/business-central-$CBG_PROFILE"`
         if curl --output /dev/null --silent --head --fail "http://$BC_HOST:$BC_PORT/business-central"
         then
             echo -e "business-central \t ${CBG_BLUE}running${CBG_NC}"
+        elif [ -n "$isDockerRunning" ] ; then
+            echo -e "business-central \t ${CBG_GREEN}starting${CBG_NC}"
         elif [ -n "$isDocker" ] ; then
             echo -e "business-central \t ${CBG_GREEN}ready to start${CBG_NC}"
         else
@@ -72,6 +76,9 @@ case $1 in
         echo "[Business Central] Removing business-central Docker container and its image..."
         docker rm -f business-central-$CBG_PROFILE > /dev/null 2>&1
         docker rmi -f cbg/business-central-$CBG_PROFILE > /dev/null 2>&1
+    ;;
+    logs)
+        docker exec -it business-central-$CBG_PROFILE tail -f /opt/jboss/wildfly/standalone/log/server.log
     ;;
     *)
     echo -e "$HELP"

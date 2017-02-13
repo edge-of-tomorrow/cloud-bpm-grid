@@ -60,8 +60,11 @@ case $1 in
         fi
     ;;
     status)
-        if [ -d "$ASSETS_DIR" ]; then
-            echo -e "bpm-assets \t\t ${CBG_BLUE}running or ready to start${CBG_NC}"
+        if [ ! $(find $ASSETS_DIR -maxdepth 0 -type d -empty 2>/dev/null) ]
+        then
+            echo -e "bpm-assets \t\t ${CBG_BLUE}in sync${CBG_NC}"
+        elif [ -d "$ASSETS_DIR" ]; then
+            echo -e "bpm-assets \t\t ${CBG_GREEN}ready (needs start)${CBG_NC}"
         else
             echo -e "bpm-assets \t\t ${CBG_RED}new (needs setup)${CBG_NC}"
         fi

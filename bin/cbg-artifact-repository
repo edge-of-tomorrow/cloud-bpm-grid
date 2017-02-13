@@ -45,7 +45,7 @@ case $1 in
     start|restart)
         docker rm -f artifact-repository > /dev/null 2>&1
         echo "[Artifact Repository] Starting new artifact-repository Docker container, please wait... (~30s)"
-        docker run -d -p $NEXUS_PORT:8081 --name artifact-repository -v $NEXUS_DATA:/nexus-data sonatype/nexus3 > /dev/null
+        docker run --privileged -d -p $NEXUS_PORT:8081 --name artifact-repository -v $NEXUS_DATA:/nexus-data sonatype/nexus3 > /dev/null
     ;;
     open)
         if which xdg-open > /dev/null
@@ -58,10 +58,13 @@ case $1 in
     ;;
     status)
         isDocker=`docker images | grep "^\(docker\.io\/\)\?sonatype/nexus3"`
+        isDockerRunning=`docker ps | grep "sonatype/nexus3"`
         if curl --output /dev/null --silent --head --fail "http://$NEXUS_HOST:$NEXUS_PORT"
         then
             echo -e "artifact-repository \t ${CBG_BLUE}running${CBG_NC}"
-        elif [ -n "$NEXUS_DATA" ] && [ -n "$isDocker" ] ; then
+        elif [ -d "$NEXUS_DATA" ] && [ -n "$isDockerRunning" ] ; then
+            echo -e "artifact-repository \t ${CBG_GREEN}starting${CBG_NC}"
+        elif [ -d "$NEXUS_DATA" ] && [ -n "$isDocker" ] ; then
             echo -e "artifact-repository \t ${CBG_GREEN}ready to start${CBG_NC}"
         else
             echo -e "artifact-repository \t ${CBG_RED}new (needs setup)${CBG_NC}"
