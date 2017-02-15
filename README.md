@@ -18,7 +18,7 @@ export PATH=$PATH:$CBG_HOME/bin
 export CBG_PROFILE=default
 ```
 
-Set all configuration in a single file ```\$CBG_HOME/profiles/\$CBG_PROFILE/conf/base.cfg```.
+Set all configuration in a single file ```$CBG_HOME/profiles/$CBG_PROFILE/conf/base.cfg```.
 
 ## Usage
 
