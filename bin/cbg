@@ -48,6 +48,11 @@ case $SOLUTION in
     ;;
 esac
 
+if [ -z "$CBG_PROFILE" ]; then
+    CBG_PROFILE=default
+fi
+echo ">          Cloud BPM Grid [$CBG_PROFILE]          <"
+
 for p in "${platform[@]}"
 do
     $CBG_HOME/bin/$p $1

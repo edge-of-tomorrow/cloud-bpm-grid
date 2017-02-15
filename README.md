@@ -15,9 +15,10 @@ Prerequisites - Maven 3.2.5+, JDK 1.8, **Docker** (1.10.3)
 ```sh
 export CBG_HOME=[path to the root of this repository]
 export PATH=$PATH:$CBG_HOME/bin
+export CBG_PROFILE=default
 ```
 
-Set all configuration in a single file ```conf/base.cfg```.
+Set all configuration in a single file ```\$CBG_HOME/profiles/\$CBG_PROFILE/conf/base.cfg```.
 
 ## Usage
 
@@ -30,9 +31,23 @@ cbg COMMAND [SOLUTION=all|authoring|runtime]
 4. cbg stop
 ```
 
-> Each server can be managed with its script (e.g. PostgreSQL database via \$CBG_HOME/bin/cbg-database).
+> Each server can be managed with its script:
 
-> To get status of the platform execute ```cbg status```
+* Authentication Server via ```cbg-authentication-server```
+* Business Central via ```cbg-business-central```
+* Process Server via ```cbg-process-server```
+* etc.
+
+> To get status of the entire platform execute ```cbg status```
+```sh
+>          Cloud BPM Grid [default]          <
+artifact-repository      ready to start
+database                 ready to start
+authentication-server 	 ready to start
+bpm-assets               ready to start
+business-central         new (ready to build)
+process-server           new (ready to build)
+```
 
 ## Architecture
 
@@ -46,3 +61,4 @@ business-central      | JBPM Workbench in Wildfly 10 Docker image
 process-server        | JBPM Kie Server in Wildfly 10 Docker image
 
 ![Cloud BPM Grid Architecture](https://github.com/edge-of-tomorrow/cloud-bpm-grid/raw/master/doc/architecture.png "Cloud BPM Grid Architecture")
+

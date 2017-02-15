@@ -64,7 +64,7 @@ case $1 in
         then
             echo -e "bpm-assets \t\t ${CBG_BLUE}in sync${CBG_NC}"
         elif [ -d "$ASSETS_DIR" ]; then
-            echo -e "bpm-assets \t\t ${CBG_GREEN}ready (needs start)${CBG_NC}"
+            echo -e "bpm-assets \t\t ${CBG_GREEN}ready to start${CBG_NC}"
         else
             echo -e "bpm-assets \t\t ${CBG_RED}new (needs setup)${CBG_NC}"
         fi
