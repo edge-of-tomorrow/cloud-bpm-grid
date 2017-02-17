@@ -30,7 +30,7 @@ case $1 in
     build|rebuild)
         docker rm -f business-central-$CBG_PROFILE > /dev/null 2>&1
         docker rmi -f cbg/business-central > /dev/null 2>&1
-        echo "[Business Central] Building web archive and creating new Docker image cbg/business-central-$CBG_PROFILE..."
+        echo "[Business Central] Building web archive and creating new Docker image cbg/business-central..."
         cd $CBG_HOME/images/business-central
         mvn clean package -Dauth.host=$AUTH_HOST -Dauth.port=$AUTH_PORT -Dauth.realm=$AUTH_REALM -Dauth.public.key=$AUTH_PUBLIC_KEY -Dauth.business.central.secret=$AUTH_BUSINESS_CENTRAL_SECRET -e
         cd - > /dev/null
