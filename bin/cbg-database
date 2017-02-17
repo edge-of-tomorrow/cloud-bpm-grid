@@ -24,7 +24,7 @@ case $1 in
         echo "[Database] Setting up DB Data persistent storage..."
         if [ -d $DB_DIR ]; then
             while true; do
-                read -p "[Database] Database exists, do you wish to clean it yes/no? " yn
+                read -p "[Database] Database '$DB_DIR' exists, do you wish to clean it yes/no? " yn
                 case $yn in
                     [Yy]* ) echo "[Database] Remove DB_DIR=$DB_DIR"; sudo rm -rf $DB_DIR; mkdir -p -m 777 $DB_DIR; chgrp docker $DB_DIR; break;;
                     [Nn]* ) break;;
