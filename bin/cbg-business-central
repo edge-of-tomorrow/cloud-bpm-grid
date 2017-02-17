@@ -80,7 +80,7 @@ case $1 in
     logs)
         docker exec -it business-central-$CBG_PROFILE tail -f /opt/jboss/wildfly/standalone/log/server.log
     ;;
-    *)
+    help)
     echo -e "$HELP"
     ;;
 esac

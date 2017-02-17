@@ -81,7 +81,7 @@ case $1 in
         echo "[BPM Assets] Removing assets from the persistent storage $ASSETS_DIR..."
         sudo rm -rf $ASSETS_DIR
     ;;
-    *)
+    help)
     echo -e "$HELP"
     ;;
 esac

@@ -73,7 +73,7 @@ case $1 in
     clear)
         # nothing to do
     ;;
-    *)
+    help)
     echo -e "$HELP"
     ;;
 esac

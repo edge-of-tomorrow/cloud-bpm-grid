@@ -5,7 +5,7 @@ Solutions:
 
 1. **Authoring** - Business Central + BPM Assets + Authentication Server
 2. **Runtime** - Process Server + Authentication Server + PostgreSQL DB
-3. **Complete** - Authoring + Runtime
+3. **Complete** (default profile) - Authoring + Runtime
 
 See all [out of the box features on wiki](https://github.com/edge-of-tomorrow/cloud-bpm-grid/wiki/Features).
 
@@ -22,7 +22,7 @@ Set all configuration in a single file ```$CBG_HOME/profiles/$CBG_PROFILE/conf/b
 
 ## Usage
 
-cbg COMMAND [SOLUTION=all|authoring|runtime]
+cbg COMMAND [PROFILE=default]
 
 ```sh
 1. cbg setup
@@ -38,7 +38,7 @@ cbg COMMAND [SOLUTION=all|authoring|runtime]
 * Process Server via ```cbg-process-server```
 * etc.
 
-> To get status of the entire platform execute ```cbg status```
+> To get status of the entire platform execute ```cbg status default```
 ```sh
 >          Cloud BPM Grid [default]          <
 artifact-repository      ready to start

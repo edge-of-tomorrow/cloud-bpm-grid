@@ -1,12 +1,14 @@
 #!/bin/sh
 
+source $CBG_HOME/bin/env.properties
+
 # Cloud BPM Grid
 
 HELP="""
-Usage: cbg COMMAND [SOLUTION]
+Usage: cbg COMMAND [PROFILE=default]
        cbg --help
 
-Cloud BPM Grid - Business Central and Process Server integrated with Nexus artifact repository, KeyCloak authentication server and PostgreSQL DB.
+Cloud BPM Grid - Platform which integrates latest JBoss community projects in order to provide \"complete\" BPM solutions.
 
 COMMANDS:
     setup \t Setup the platform and download Docker images
@@ -18,44 +20,23 @@ COMMANDS:
     stop \t Stop the platform
     clear \t Clear all data
 
-SOLUTIONS:
-    all \t Default
-    authoring \t Business Central + BPM Assets + Authentication Server + PostgreSQL DB (only for Authentication Server)
-    runtime \t Process Server + Authentication Server + PostgreSQL DB
+PROFILE:
+    default \t Default profile
+    custom \t Any profile stored in the profiles folder
 
 Each server can be managed with its script (e.g. PostgreSQL database via \$CBG_HOME/bin/cbg-database).
 """
 
-if [ -n "$2" ]; then
-    SOLUTION=$2
-else
-    SOLUTION=all
-fi
-
-case $SOLUTION in
-    all)
-        platform=(cbg-artifact-repository cbg-database cbg-authentication-server cbg-bpm-assets cbg-business-central cbg-process-server)
-    ;;
-    authoring)
-        platform=(cbg-database cbg-authentication-server cbg-bpm-assets cbg-business-central)
-    ;;
-    runtime)
-        platform=(cbg-database cbg-authentication-server cbg-process-server)
-    ;;
-    *)
-    echo -e "$HELP"
+if [ "$1" == "help" ]; then
+    printf "$HELP"
     exit
-    ;;
-esac
-
-if [ -z "$CBG_PROFILE" ]; then
-    CBG_PROFILE=default
 fi
+
 echo ">          Cloud BPM Grid [$CBG_PROFILE]          <"
 
-for p in "${platform[@]}"
+for p in "${CBG_PLATFORM[@]}"
 do
-    $CBG_HOME/bin/$p $1
+    $CBG_HOME/bin/$p $1 $2
 done
 
 if [ "$1" == "start" ] || [ "$1" == "restart" ]; then

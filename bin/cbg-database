@@ -79,7 +79,7 @@ case $1 in
             sudo rm -rf $DB_DIR
         fi
     ;;
-    *)
+    help)
     echo -e "$HELP"
     ;;
 esac

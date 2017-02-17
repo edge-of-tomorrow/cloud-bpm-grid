@@ -77,7 +77,7 @@ case $1 in
     clear)
         rm -rf $NEXUS_DATA
     ;;
-    *)
+    help)
     echo -e "$HELP"
     ;;
 esac
