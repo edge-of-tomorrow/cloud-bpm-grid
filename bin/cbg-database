@@ -47,15 +47,20 @@ case $1 in
         echo "[Database] Starting new bpm-database Docker container in $DB_DIR..."
         docker run --privileged -p $DB_PORT:5432 --name bpm-database -e POSTGRES_DB=$DB_NAME -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PWD -e POSTGRES_ROOT_PASSWORD=rootman1234! -v $DB_DIR:/var/lib/postgresql/data -d postgres > /dev/null
         echo "- jdbc:postgresql://$DB_HOST:$DB_PORT/$DB_NAME"
-        echo "[Database] Waiting for the database to start..."
+        echo "[Database] Waiting 10s for the database to start"
         loops=0
         while : ; do
             isRunning=`docker ps | grep "\ postgres.*Up"`
             [[ -z "$isRunning" ]] || break
-            [[ $loops == 10 ]] || break
+            if [ $loops == 10 ]; then
+                printf "[Database] has not started yet, to see the logs run 'docker logs bpm-database'"
+                break
+            fi
             sleep 1
+            echo -ne "[Database] ... ${loops}s passed"\\r
             ((loops++))
         done
+        printf "\n"
     ;;
     status)
         isDocker=`docker images | grep "^\(docker\.io\/\)\?postgres"`

@@ -60,7 +60,8 @@ case $1 in
         fi
     ;;
     status)
-        if [ ! $(find $ASSETS_DIR -maxdepth 0 -type d -empty 2>/dev/null) ]
+        CBG_ASSETS_EMPTY=$(find $ASSETS_DIR -maxdepth 0 -type d -empty 2>/dev/null)
+        if [ -d "$ASSETS_DIR" ] && [ ! $CBG_ASSETS_EMPTY ]
         then
             echo -e "bpm-assets \t\t ${CBG_BLUE}in sync${CBG_NC}"
         elif [ -d "$ASSETS_DIR" ]; then
