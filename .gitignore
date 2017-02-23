@@ -15,6 +15,9 @@
 log/
 target/
 
-# Others
+# Cloud BPM Grid
 process-server-1.xml
 work
+profiles
+!profiles/default
+
