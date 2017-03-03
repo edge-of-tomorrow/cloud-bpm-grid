@@ -21,16 +21,18 @@ COMMANDS:
     stop \t Stop Process Server
     clear \t Clear build data
     logs \t Show logs of Process Server
+    push \t Push Process Server Docker image to the Docker Hub
 """
 
 case $1 in
     setup)
-        # nothing to do
+        echo "[Process Server] Pulling latest Process Server Docker image..."
+        docker pull bpmgrid/process-server > /dev/null
     ;;
     build|rebuild)
         docker rm -f process-server-$CBG_PROFILE > /dev/null 2>&1
-        docker rmi -f cbg/process-server > /dev/null 2>&1
-        echo "[Process Server] Building web archive and creating new Docker image cbg/process-server..."
+        docker rmi -f bpmgrid/process-server > /dev/null 2>&1
+        echo "[Process Server] Building web archive and creating new Docker image bpmgrid/process-server..."
         cd $CBG_HOME/images/process-server
         mvn clean package -Dauth.host=$AUTH_HOST -Dauth.port=$AUTH_PORT -Dauth.realm=$AUTH_REALM -Dauth.public.key=$AUTH_PUBLIC_KEY -Dauth.process.server.secret=$AUTH_PROCESS_SERVER_SECRET -Dcbg.conf.dir=$CBG_PROFILE_PATH/conf
         cd - > /dev/null
@@ -39,7 +41,7 @@ case $1 in
         docker rm -f process-server-$CBG_PROFILE > /dev/null 2>&1
         echo "[Process Server] Starting new process-server Docker container..."
         # TODO put logs to $CBG_HOME/work/logs
-        docker run -d -p $PROCESS_SERVER_PORT:8181 --net="host" --name process-server-$CBG_PROFILE -e PROCESS_SERVER_ID=$PROCESS_SERVER_ID -e PROCESS_SERVER_CONTROLLER="http://$BC_HOST:$BC_PORT/business-central/rest/controller" -e BUSINESS_CENTRAL_CONTROLLER_USER=$BUSINESS_CENTRAL_CONTROLLER_USER -e BUSINESS_CENTRAL_CONTROLLER_PWD=$BUSINESS_CENTRAL_CONTROLLER_PWD -e DB_NAME=$DB_NAME -e DB_USER=$DB_USER -e DB_PWD=$DB_PWD -e DB_HOST=$DB_HOST -e DB_PORT=$DB_PORT -e PROCESS_SERVER_HOST=$PROCESS_SERVER_HOST -e PROCESS_SERVER_PORT=$PROCESS_SERVER_PORT -e LOGGER_PACKAGE=$LOGGER_PACKAGE -e LOGGER_LEVEL=$LOGGER_LEVEL -e MAIL_FROM=$MAIL_FROM -e TASK_INBOX_URL=$TASK_INBOX_URL cbg/process-server > /dev/null
+        docker run -d -p $PROCESS_SERVER_PORT:8181 --net="host" --name process-server-$CBG_PROFILE -e PROCESS_SERVER_ID=$PROCESS_SERVER_ID -e PROCESS_SERVER_CONTROLLER="http://$BC_HOST:$BC_PORT/business-central/rest/controller" -e BUSINESS_CENTRAL_CONTROLLER_USER=$BUSINESS_CENTRAL_CONTROLLER_USER -e BUSINESS_CENTRAL_CONTROLLER_PWD=$BUSINESS_CENTRAL_CONTROLLER_PWD -e DB_NAME=$DB_NAME -e DB_USER=$DB_USER -e DB_PWD=$DB_PWD -e DB_HOST=$DB_HOST -e DB_PORT=$DB_PORT -e PROCESS_SERVER_HOST=$PROCESS_SERVER_HOST -e PROCESS_SERVER_PORT=$PROCESS_SERVER_PORT -e LOGGER_PACKAGE=$LOGGER_PACKAGE -e LOGGER_LEVEL=$LOGGER_LEVEL -e MAIL_FROM=$MAIL_FROM -e TASK_INBOX_URL=$TASK_INBOX_URL bpmgrid/process-server > /dev/null
     ;;
     open)
         if which xdg-open > /dev/null
@@ -51,8 +53,8 @@ case $1 in
         fi
     ;;
     status)
-        isDocker=`docker images | grep "^\(docker\.io\/\)\?cbg/process-server"`
-        isDockerRunning=`docker ps | grep "cbg/process-server"`
+        isDocker=`docker images | grep "^\(docker\.io\/\)\?bpmgrid/process-server"`
+        isDockerRunning=`docker ps | grep "bpmgrid/process-server"`
         if curl --output /dev/null --silent --head --fail "http://$PROCESS_SERVER_HOST:$PROCESS_SERVER_PORT/kie-server/docs"
         then
             echo -e "process-server \t\t ${CBG_BLUE}running${CBG_NC}"
@@ -75,10 +77,13 @@ case $1 in
         cd - > /dev/null
         echo "[Process Server] Removing process-server Docker container and its image..."
         docker rm -f process-server-$CBG_PROFILE > /dev/null 2>&1
-        docker rmi -f cbg/process-server > /dev/null 2>&1
+        docker rmi -f bpmgrid/process-server > /dev/null 2>&1
     ;;
     logs)
         docker exec -it process-server-$CBG_PROFILE tail -f /opt/jboss/wildfly/standalone/log/server.log
+    ;;
+    push)
+        docker push bpmgrid/process-server
     ;;
     help)
     echo -e "$HELP"

@@ -126,7 +126,7 @@
         </executions>
         <configuration>
           <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
-          <imageName>cbg/process-server</imageName>
+          <imageName>bpmgrid/process-server</imageName>
           <resources>
             <resource>
               <targetPath>/</targetPath>

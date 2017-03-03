@@ -81,7 +81,7 @@
         </executions>
         <configuration>
           <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
-          <imageName>cbg/business-central</imageName>
+          <imageName>bpmgrid/business-central</imageName>
           <resources>
             <resource>
               <targetPath>/</targetPath>
