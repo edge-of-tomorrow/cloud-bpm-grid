@@ -9,6 +9,8 @@ Solutions:
 
 See all [out of the box features on wiki](https://github.com/edge-of-tomorrow/cloud-bpm-grid/wiki/Features).
 
+![Screens](https://github.com/edge-of-tomorrow/cloud-bpm-grid/raw/master/doc/screens.png "Screens")
+
 ## Env Setup
 
 Prerequisites - Maven 3.2.5+, JDK 1.8, **Docker** (1.10.3)
@@ -26,7 +28,7 @@ cbg COMMAND [PROFILE=default]
 
 ```sh
 1. cbg setup
-2. cbg build
+2. cbg build (optional for the latest SNAPSHOT)
 3. cbg start
 4. cbg stop
 ```
