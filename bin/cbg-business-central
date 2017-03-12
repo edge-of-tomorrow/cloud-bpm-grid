@@ -34,14 +34,13 @@ case $1 in
         docker rmi -f bpmgrid/business-central > /dev/null 2>&1
         echo "[Business Central] Building web archive and creating new Docker image bpmgrid/business-central..."
         cd $CBG_HOME/images/business-central
-        mvn clean package -Dauth.host=$AUTH_HOST -Dauth.port=$AUTH_PORT -Dauth.realm=$AUTH_REALM -Dauth.public.key=$AUTH_PUBLIC_KEY -Dauth.business.central.secret=$AUTH_BUSINESS_CENTRAL_SECRET -e
+        mvn clean package
         cd - > /dev/null
     ;;
     start|restart)
         docker rm -f business-central-$CBG_PROFILE > /dev/null 2>&1
         echo "[Business Central] Starting new business-central Docker container..."
-        # TODO put logs to $CBG_HOME/logs
-        docker run --privileged -d -p $BC_PORT:8080 --net="host" --name business-central-$CBG_PROFILE -v $ASSETS_DIR:/opt/jboss/wildfly/bin/.niogit bpmgrid/business-central > /dev/null
+        docker run --privileged -d -p $BC_PORT:8080 --net="host" --name business-central-$CBG_PROFILE -e AUTH_HOST=$AUTH_HOST -e AUTH_PORT=$AUTH_PORT -e AUTH_REALM=$AUTH_REALM -e AUTH_BUSINESS_CENTRAL_SECRET=$AUTH_BUSINESS_CENTRAL_SECRET -v $ASSETS_DIR:/opt/jboss/wildfly/bin/.niogit bpmgrid/business-central > /dev/null
     ;;
     open)
         if which xdg-open > /dev/null
