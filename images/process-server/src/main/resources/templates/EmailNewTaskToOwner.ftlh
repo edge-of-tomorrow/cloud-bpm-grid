@@ -10,5 +10,7 @@
   	<li>${key}: ${taskInputs[key]}</li>
   </#list>
   </ul>
+
+  <a target="_blank" href="${processDiagramUrl}">Show the current process diagram</a>
 </body>
 </html>

@@ -45,6 +45,7 @@ public class NotifyOwnersByEmailTaskListener extends DefaultTaskEventListener {
     private static final String MAIL_OWNER_TEMPLATE = "EmailNewTaskToOwner.ftlh";
     private static final String MAIL_POTOWNER_TEMPLATE = "EmailNewTaskToPotentialOwners.ftlh";
     private static final String TASK_INBOX_URL = System.getProperty("org.kie.task.inbox.url", "http://localhost:8080/business-central");
+    private static final String PROCESS_SERVER_URL = "http://localhost:8181/kie-server";
     private static final String MAIL_CC = "mail_cc";
     private static final String MAIL_CC_GROUP = System.getProperty("org.kie.mail.cc.tasks.group", "CCTasks");
     
@@ -102,6 +103,10 @@ public class NotifyOwnersByEmailTaskListener extends DefaultTaskEventListener {
             }
         }
         
+        String containerId = "default"; // TODO: set containerId of a smart router, this is a workaround now
+        String processDiagramUrl = PROCESS_SERVER_URL + "/services/rest/server/containers/" + containerId + "/images/processes/instances/" + task.getTaskData().getProcessInstanceId();
+        dataModel.put("processDiagramUrl", processDiagramUrl);
+
         try {
             StringWriter sw = new StringWriter();
             temp.process(dataModel, sw);

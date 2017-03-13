@@ -17,5 +17,7 @@
   	<li><b>${colleague}</b></li>
   </#list>
   </ul>
+
+  <a target="_blank" href="${processDiagramUrl}">Show the current process diagram</a>
 </body>
 </html>
