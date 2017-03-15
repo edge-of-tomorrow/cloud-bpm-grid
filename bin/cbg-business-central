@@ -76,7 +76,7 @@ case $1 in
         cd - > /dev/null
         echo "[Business Central] Removing business-central Docker container and its image..."
         docker rm -f business-central-$CBG_PROFILE > /dev/null 2>&1
-        docker rmi -f bpmgrid/business-central-$CBG_PROFILE > /dev/null 2>&1
+        docker rmi -f bpmgrid/business-central > /dev/null 2>&1
     ;;
     logs)
         docker exec -it business-central-$CBG_PROFILE tail -f /opt/jboss/wildfly/standalone/log/server.log

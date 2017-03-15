@@ -106,7 +106,9 @@ case $1 in
         docker rm -f authentication-server > /dev/null 2>&1
     ;;
     clear)
-        # nothing to do
+        echo "[Authentication Server] Removing authentication-server Docker container and its image..."
+        docker rm -f authentication-server > /dev/null 2>&1
+        docker rmi -f jboss/keycloak-postgres > /dev/null 2>&1
     ;;
     help)
     echo -e "$HELP"
