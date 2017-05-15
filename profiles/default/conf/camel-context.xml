@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+  <bean id="bridgePropertyPlaceholder"
+        class="org.apache.camel.spring.spi.BridgePropertyPlaceholderConfigurer" />
+
+  <camelContext xmlns="http://camel.apache.org/schema/spring">
+    <endpoint id="kieCamelEndpoint"
+              uri="kie:http://{{env:PROCESS_SERVER_INTEGRATION_USER}}:{{env:PROCESS_SERVER_INTEGRATION_PWD}}@{{env:PROCESS_SERVER_HOST}}:{{env:PROCESS_SERVER_PORT}}/kie-server/services/rest/server?client=process"/>
+
+    <!--
+         Example of a camel route starting a new process 'org.cbg.ExampleProcessDefinition' contained in
+         a KIE Container with ID 'example-kie-container-id' that had been deployed to the Process Server.
+    -->
+    <route>
+      <from uri="direct:startProcess"/>
+      <setHeader headerName="CamelKieOperation">
+        <constant>startProcess</constant>
+      </setHeader>
+      <setHeader headerName="CamelKieContainerId">
+        <constant>example-kie-container-id</constant>
+      </setHeader>
+      <setHeader headerName="CamelKieProcessId">
+        <constant>org.cbg.ExampleProcessDefinition</constant>
+      </setHeader>
+
+      <to uri="ref:kieCamelEndpoint"/>
+      <setBody>
+        <simple>Process instance started with ID: ${body}</simple>
+      </setBody>
+      <to uri="stream:out"/>
+    </route>
+
+  </camelContext>
+
+</beans>

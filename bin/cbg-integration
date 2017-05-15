@@ -1,0 +1,97 @@
+#!/bin/sh
+
+source $CBG_HOME/bin/env.properties
+
+# Cloud BPM Grid - Integration
+
+HELP="""
+Usage: cbg-integration COMMAND
+       cbg-integration --help
+
+Integration for Cloud BPM Grid.
+
+COMMANDS:
+    setup \t No-op
+    build \t Build Fat-jar package of Integration
+    rebuild \t Rebuild Fat-jar package of Integration
+    start \t Start Integration
+    restart \t Restart Integration
+    status \t Show status of Integration
+    stop \t Stop Integration
+    clear \t Clear build data
+    push \t Push Integration Docker image to the Docker Hub
+"""
+
+function waitForProcessServerToStart {
+        echo "[Integration] Waiting $(($1))s for the process server to start"
+        loops=0
+        while : ; do
+            if curl --output /dev/null --silent --head --fail "http://$PROCESS_SERVER_HOST:$PROCESS_SERVER_PORT/kie-server/docs"
+            then
+                break
+            fi
+            if [ $loops == $1 ]; then
+                printf "[Integration] Process Server has not started yet, to see the logs run 'docker logs process-server-$CBG_PROFILE'"
+                break
+            fi
+            sleep 1
+            echo -ne "[Integration] ... ${loops}s passed"\\r
+            ((loops++))
+        done
+        printf "\n"
+}
+
+case $1 in
+    setup)
+        echo "[Integration] Pulling latest Integration Docker image..."
+        docker pull bpmgrid/integration > /dev/null
+    ;;
+    build|rebuild)
+        docker rm -f integration-$CBG_PROFILE > /dev/null 2>&1
+        docker rmi -f bpmgrid/integration > /dev/null 2>&1
+        echo "[Integration] Building java archive and creating new Docker image bpmgrid/integration..."
+        cd $CBG_HOME/images/integration
+        mvn clean package
+        cd - > /dev/null
+    ;;
+    start|restart)
+        docker rm -f integration-$CBG_PROFILE > /dev/null 2>&1
+        echo "[Integration] Starting new integration Docker container..."
+        # how many seconds to wait for process server to start up
+        waitForProcessServerToStart $PROCESS_SERVER_STARTUP_WAIT
+        # TODO put logs to $CBG_HOME/work/logs
+        docker run -d --net="host" --name integration-$CBG_PROFILE -v $INTEGRATION_CAMEL_CONTEXT:/etc/camel-context.xml -e PROCESS_SERVER_HOST=$PROCESS_SERVER_HOST -e PROCESS_SERVER_PORT=$PROCESS_SERVER_PORT -e PROCESS_SERVER_INTEGRATION_USER=$PROCESS_SERVER_INTEGRATION_USER -e PROCESS_SERVER_INTEGRATION_PWD=$PROCESS_SERVER_INTEGRATION_PWD bpmgrid/integration > /dev/null
+    ;;
+    status)
+        isDocker=`docker images | grep "^\(docker\.io\/\)\?bpmgrid/integration"`
+        isDockerRunning=`docker ps | grep "bpmgrid/integration"`
+        if [ -n "$isDockerRunning" ]
+        then
+            echo -e "integration \t\t ${CBG_BLUE}running${CBG_NC}"
+        elif [ -n "$isDocker" ] ; then
+            echo -e "integration \t\t ${CBG_GREEN}ready to start${CBG_NC}"
+        else
+            echo -e "integration \t\t ${CBG_RED}new (ready to build)${CBG_NC}"
+        fi
+    ;;
+    stop)
+        echo "[Integration] Removing integration Docker container..."
+        docker rm -f integration-$CBG_PROFILE > /dev/null 2>&1
+    ;;
+    clear)
+        echo "[Integration] Cleaning Integration project..."
+        cd $CBG_HOME/images/integration
+        mvn clean > /dev/null
+        cd - > /dev/null
+        echo "[Integration] Removing integration Docker container and its image..."
+        docker rm -f integration-$CBG_PROFILE > /dev/null 2>&1
+        docker rmi -f bpmgrid/integration > /dev/null 2>&1
+    ;;
+    push)
+        docker push bpmgrid/integration
+    ;;
+    help)
+    echo -e "$HELP"
+    ;;
+esac
+
