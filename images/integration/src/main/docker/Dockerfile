@@ -7,7 +7,7 @@ MAINTAINER "Radovan Synek" "rsynek@redhat.com"
 ####### ENVIRONMENT ############
 ENV JAVA_OPTS -Xms128m -Xmx128m -Djava.net.preferIPv4Stack=true
 
-ENV INTEGRATION_JAR integration-1.0-SNAPSHOT.jar
+ENV INTEGRATION_JAR integration-${project.version}.jar
 
 # ! ENV PROCESS_SERVER_HOST
 # ! ENV PROCESS_SERVER_PORT

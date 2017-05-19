@@ -9,8 +9,8 @@ ENV JAVA_OPTS -XX:MaxPermSize=256m -Xms256m -Xmx768m -Djava.net.preferIPv4Stack=
 ENV JBOSS_BIND_ADDRESS 0.0.0.0
 
 ENV PROCESS_SERVER_ID process-server-1
-ENV PROCESS_SERVER_VERSION 7.0.0-SNAPSHOT
-ENV PROCESS_SERVER_WAR kie-server-1.0-SNAPSHOT
+ENV PROCESS_SERVER_VERSION ${version.org.kie}
+ENV PROCESS_SERVER_WAR kie-server-${project.version}
 
 # ! ENV PROCESS_SERVER_CONTROLLER http://$BC_HOST:$BC_PORT/business-central/rest/controller
 
@@ -20,7 +20,7 @@ ENV PROCESS_SERVER_WAR kie-server-1.0-SNAPSHOT
 # ENV TASK_INBOX_URL http://$BC_HOST:$BC_PORT/business-central
 # ENV MAIL_FROM noreply@bpm.grid
 
-ENV KEYCLOAK_VERSION 3.1.0.Final
+ENV KEYCLOAK_VERSION ${version.org.keycloak}
 
 # ! ENV DB_NAME
 # ! ENV DB_USER
