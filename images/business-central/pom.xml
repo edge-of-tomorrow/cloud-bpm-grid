@@ -2,36 +2,22 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  
+
+  <parent>
+    <groupId>org.kie.bpm.grid</groupId>
+    <artifactId>cbg-images-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
   <groupId>org.kie.bpm.grid</groupId>
   <artifactId>business-central</artifactId>
-  <version>1.0-SNAPSHOT</version>
+
   <name>Cloud BPM Grid - Business Central</name>
-  
-  <properties>
-    <kie.version>7.0.0-SNAPSHOT</kie.version>
-    
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <maven.compiler.source>1.8</maven.compiler.source>
-  </properties>
-  
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-bom</artifactId>
-        <version>${kie.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-wb-webapp</artifactId>
-      <version>${kie.version}</version>
       <type>war</type>
     </dependency>
   </dependencies>
@@ -69,7 +55,6 @@
       <plugin>
         <groupId>com.spotify</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>0.4.13</version>
         <executions>
           <execution>
             <id>docker</id>
@@ -100,33 +85,7 @@
           </resources>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
-        <configuration>
-          <source>${maven.compiler.source}</source>
-          <target>${maven.compiler.target}</target>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
-  
-  <repositories>  
-    <repository>  
-      <id>jboss-public-repository-group</id>  
-      <name>JBoss Public Repository Group</name>  
-      <url>http://repository.jboss.org/nexus/content/groups/public/</url>  
-      <layout>default</layout>  
-      <releases>  
-        <enabled>true</enabled>  
-        <updatePolicy>never</updatePolicy>  
-      </releases>  
-      <snapshots>  
-        <enabled>true</enabled>  
-        <updatePolicy>daily</updatePolicy>  
-      </snapshots>  
-    </repository>  
-  </repositories>
   
 </project>
