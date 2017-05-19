@@ -126,12 +126,6 @@
   </dependencies>
   
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -162,17 +156,8 @@
         <groupId>com.spotify</groupId>
         <artifactId>docker-maven-plugin</artifactId>
         <version>0.4.13</version>
-        <executions>
-          <execution>
-            <id>docker</id>
-            <phase>package</phase>
-            <goals>
-              <goal>build</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
-          <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
+          <dockerDirectory>${project.build.directory}/docker</dockerDirectory>
           <imageName>bpmgrid/integration</imageName>
           <resources>
             <resource>

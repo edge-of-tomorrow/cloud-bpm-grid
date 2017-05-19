@@ -7,10 +7,10 @@ MAINTAINER "Ivo Bek" "ibek@redhat.com"
 ####### ENVIRONMENT ############
 ENV JAVA_OPTS -XX:MaxPermSize=256m -Xms1303m -Xmx1303m -Djava.net.preferIPv4Stack=true
 
-ENV BUSINESS_CENTRAL_VERSION 7.0.0-SNAPSHOT
-ENV BUSINESS_CENTRAL_WAR kie-wb-1.0-SNAPSHOT
+ENV BUSINESS_CENTRAL_VERSION ${version.org.kie}
+ENV BUSINESS_CENTRAL_WAR kie-wb-${project.version}
 
-ENV KEYCLOAK_VERSION 3.1.0.Final
+ENV KEYCLOAK_VERSION ${version.org.keycloak}
 # ! ENV AUTH_HOST
 # ! ENV AUTH_PORT
 # ! ENV AUTH_REALM
