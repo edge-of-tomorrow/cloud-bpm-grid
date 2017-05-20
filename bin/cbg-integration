@@ -30,7 +30,7 @@ function waitForProcessServerToStart {
             then
                 break
             fi
-            if [ $loops == $1 ]; then
+            if [[ $loops == $1 ]]; then
                 printf "[Integration] Process Server has not started yet, to see the logs run 'docker logs process-server-$CBG_PROFILE'"
                 break
             fi
