@@ -82,7 +82,8 @@ case $1 in
         docker exec -it business-central-$CBG_PROFILE tail -f /opt/jboss/wildfly/standalone/log/server.log
     ;;
     push)
-        docker push bpmgrid/business-central
+        docker bpmgrid/business-central:latest bpmgrid/business-central:$CBG_VERSION
+        docker push bpmgrid/business-central:$CBG_VERSION
     ;;
     help)
     echo -e "$HELP"
