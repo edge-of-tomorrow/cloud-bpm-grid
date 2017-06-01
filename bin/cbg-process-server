@@ -26,8 +26,8 @@ COMMANDS:
 
 case $1 in
     setup)
-        echo "[Process Server] Pulling latest Process Server Docker image..."
-        docker pull bpmgrid/process-server > /dev/null
+        echo "[Process Server] Pulling $CBG_VERSION Process Server Docker image..."
+        docker pull bpmgrid/process-server:$CBG_VERSION > /dev/null
     ;;
     build|rebuild)
         docker rm -f process-server-$CBG_PROFILE > /dev/null 2>&1

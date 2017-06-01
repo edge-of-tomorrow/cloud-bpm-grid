@@ -43,8 +43,8 @@ function waitForProcessServerToStart {
 
 case $1 in
     setup)
-        echo "[Integration] Pulling latest Integration Docker image..."
-        docker pull bpmgrid/integration > /dev/null
+        echo "[Integration] Pulling $CBG_VERSION Integration Docker image..."
+        docker pull bpmgrid/integration:$CBG_VERSION > /dev/null
     ;;
     build|rebuild)
         docker rm -f integration-$CBG_PROFILE > /dev/null 2>&1
