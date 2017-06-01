@@ -26,8 +26,8 @@ COMMANDS:
 
 case $1 in
     setup)
-        echo "[Business Central] Pulling latest Business Central Docker image..."
-        docker pull bpmgrid/business-central > /dev/null
+        echo "[Business Central] Pulling $CBG_VERSION Business Central Docker image..."
+        docker pull bpmgrid/business-central:$CBG_VERSION > /dev/null
     ;;
     build|rebuild)
         docker rm -f business-central-$CBG_PROFILE > /dev/null 2>&1
