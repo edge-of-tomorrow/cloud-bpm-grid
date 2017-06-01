@@ -83,7 +83,8 @@ case $1 in
         docker exec -it process-server-$CBG_PROFILE tail -f /opt/jboss/wildfly/standalone/log/server.log
     ;;
     push)
-        docker push bpmgrid/process-server
+        docker bpmgrid/process-server:latest bpmgrid/process-server:$CBG_VERSION
+        docker push bpmgrid/process-server:$CBG_VERSION
     ;;
     help)
     echo -e "$HELP"
