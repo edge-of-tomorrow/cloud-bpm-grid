@@ -88,7 +88,7 @@ case $1 in
         docker rmi -f bpmgrid/integration > /dev/null 2>&1
     ;;
     push)
-        docker bpmgrid/integration:latest bpmgrid/integration:$CBG_VERSION
+        docker tag bpmgrid/integration:latest bpmgrid/integration:$CBG_VERSION
         docker push bpmgrid/integration:$CBG_VERSION
     ;;
     help)
