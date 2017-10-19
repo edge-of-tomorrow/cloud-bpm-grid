@@ -60,7 +60,7 @@ case $1 in
         # how many seconds to wait for process server to start up
         waitForProcessServerToStart $PROCESS_SERVER_STARTUP_WAIT
         # TODO put logs to $CBG_HOME/work/logs
-        docker run -d --net="host" --name integration-$CBG_PROFILE -v $INTEGRATION_CAMEL_CONTEXT:/etc/camel-context.xml -e PROCESS_SERVER_HOST=$PROCESS_SERVER_HOST -e PROCESS_SERVER_PORT=$PROCESS_SERVER_PORT -e PROCESS_SERVER_INTEGRATION_USER=$PROCESS_SERVER_INTEGRATION_USER -e PROCESS_SERVER_INTEGRATION_PWD=$PROCESS_SERVER_INTEGRATION_PWD bpmgrid/integration > /dev/null
+        docker run -d --net="host" --name integration-$CBG_PROFILE -v $INTEGRATION_CAMEL_CONTEXT:/etc/camel-context.xml -e PROCESS_SERVER_HOST=$PROCESS_SERVER_HOST -e PROCESS_SERVER_PORT=$PROCESS_SERVER_PORT -e PROCESS_SERVER_INTEGRATION_USER=$PROCESS_SERVER_INTEGRATION_USER -e PROCESS_SERVER_INTEGRATION_PWD=$PROCESS_SERVER_INTEGRATION_PWD bpmgrid/integration:$CBG_VERSION > /dev/null
     ;;
     status)
         isDocker=`docker images | grep "^\(docker\.io\/\)\?bpmgrid/integration"`
