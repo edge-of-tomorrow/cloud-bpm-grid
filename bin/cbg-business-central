@@ -40,7 +40,7 @@ case $1 in
     start|restart)
         docker rm -f business-central-$CBG_PROFILE > /dev/null 2>&1
         echo "[Business Central] Starting new business-central Docker container..."
-        docker run --privileged -d -p $BC_PORT:8080 --net="host" --name business-central-$CBG_PROFILE -e AUTH_HOST=$AUTH_HOST -e AUTH_PORT=$AUTH_PORT -e AUTH_REALM=$AUTH_REALM -e AUTH_BUSINESS_CENTRAL_SECRET=$AUTH_BUSINESS_CENTRAL_SECRET -v $ASSETS_DIR:/opt/jboss/wildfly/bin/.niogit bpmgrid/business-central > /dev/null
+        docker run --privileged -d -p $BC_PORT:8080 --net="host" --name business-central-$CBG_PROFILE -e AUTH_HOST=$AUTH_HOST -e AUTH_PORT=$AUTH_PORT -e AUTH_REALM=$AUTH_REALM -e AUTH_BUSINESS_CENTRAL_SECRET=$AUTH_BUSINESS_CENTRAL_SECRET -v $ASSETS_DIR:/opt/jboss/wildfly/bin/.niogit bpmgrid/business-central:$CBG_VERSION > /dev/null
     ;;
     open)
         if which xdg-open > /dev/null
