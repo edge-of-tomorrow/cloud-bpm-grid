@@ -30,4 +30,4 @@ COPY ${INTEGRATION_JAR} /home/integration/cbg-integration.jar
 ####### COMMAND ############
 WORKDIR /home/integration
 #CMD ["./start-integration.sh"]
-CMD ["java", "-jar", "cbg-integration.jar", "/etc/camel-context.xml"]
+CMD ["java", "-jar", "cbg-integration.jar", "/etc/integration/camel-context.xml"]
